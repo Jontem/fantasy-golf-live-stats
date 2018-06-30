@@ -1,8 +1,9 @@
 import * as React from "react";
+import styled from "styled-components";
 import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
-import styled from "styled-components";
+import { calculatePoints } from "./calculate-points";
 
 // const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
 const leaderboardUrl =
@@ -143,6 +144,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
         <th>Three putt</th>
         <th>Bunker</th>
         <th>Sand save</th>
+        <th>Points</th>
       </thead>
       <tbody>
         {playerAggregates.map(playerAggregate => {
@@ -152,7 +154,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
               <td>{playerAggregate.stats.hio}</td>
               <td>{playerAggregate.stats.doubleEagle}</td>
               <td>{playerAggregate.stats.eagle}</td>
-              <td>{playerAggregate.stats.birde}</td>
+              <td>{playerAggregate.stats.birdie}</td>
               <td>{playerAggregate.stats.par}</td>
               <td>{playerAggregate.stats.bogey}</td>
               <td>{playerAggregate.stats.doubleBogey}</td>
@@ -162,6 +164,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
               <td>{playerAggregate.stats.threePutt}</td>
               <td>{playerAggregate.stats.bunker}</td>
               <td>{playerAggregate.stats.sandSave}</td>
+              <td>{calculatePoints(playerAggregate.stats)}</td>
             </tr>
           );
         })}

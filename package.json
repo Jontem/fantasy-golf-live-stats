@@ -5,6 +5,7 @@
   "license": "MIT",
   "devDependencies": {
     "styled-components": "^3.3.3",
+    "ts-exhaustive-check": "^1.0.0",
     "ts-loader": "^4.4.2",
     "typescript": "^2.9.2",
     "webpack": "^4.14.0",

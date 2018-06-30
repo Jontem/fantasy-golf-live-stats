@@ -14,7 +14,7 @@ export interface PlayerAggregateStats {
   readonly hio: number;
   readonly doubleEagle: number;
   readonly eagle: number;
-  readonly birde: number;
+  readonly birdie: number;
   readonly par: number;
   readonly bogey: number;
   readonly doubleBogey: number;
@@ -85,7 +85,7 @@ function calculateAggregateStatsForHole(
     hio: numberOfShots === 1 ? 1 : 0,
     doubleEagle: effective === -3 ? 1 : 0,
     eagle: effective === -2 ? 1 : 0,
-    birde: effective === -1 ? 1 : 0,
+    birdie: effective === -1 ? 1 : 0,
     par: effective === 0 ? 1 : 0,
     bogey: effective === 1 ? 1 : 0,
     doubleBogey: effective >= 2 ? 1 : 0,
@@ -114,7 +114,7 @@ function mergeAggregateStats(
 
 function getEmptyAggregateStats(): PlayerAggregateStats {
   return {
-    birde: 0,
+    birdie: 0,
     bogey: 0,
     doubleBogey: 0,
     doubleEagle: 0,
