@@ -50,6 +50,8 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
         <th>par</th>
         <th>bogey</th>
         <th>doubleBogey</th>
+        <th>ball in water</th>
+        <th>missed gir</th>
       </thead>
       <tbody>
         {playerAggregates.map(playerAggregate => {
@@ -63,6 +65,8 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
               <td>{playerAggregate.stats.par}</td>
               <td>{playerAggregate.stats.bogey}</td>
               <td>{playerAggregate.stats.doubleBogey}</td>
+              <td>{playerAggregate.stats.ballInWater}</td>
+              <td>{playerAggregate.stats.missedGir}</td>
             </tr>
           );
         })}

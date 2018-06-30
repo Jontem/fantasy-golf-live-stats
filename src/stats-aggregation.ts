@@ -18,6 +18,8 @@ export interface PlayerAggregateStats {
   readonly par: number;
   readonly bogey: number;
   readonly doubleBogey: number;
+  readonly ballInWater: number;
+  readonly missedGir: number;
 }
 export interface PlayerAggregate {
   readonly id: string;
@@ -44,40 +46,21 @@ function getPlayerAggregateStats(
   playerScorecard: PlayerScorecardResponse
 ): PlayerAggregateStats {
   const roundStats = playerScorecard.p.rnds.map(r => getRoundStats(holes, r));
-  return roundStats.reduce(mergeAggregateStats, {
-    birde: 0,
-    bogey: 0,
-    doubleBogey: 0,
-    doubleEagle: 0,
-    eagle: 0,
-    hio: 0,
-    par: 0
-  });
+  return roundStats.reduce(mergeAggregateStats);
 }
 
 function getRoundStats(
   holes: ReadonlyArray<Hole>,
   playerScorecardRound: PlayerScorecardRound
 ): PlayerAggregateStats {
-  return playerScorecardRound.holes.reduce(
-    (soFar, scorecardHole) => {
-      const holeId = parseInt(scorecardHole.cNum, 10);
-      const holeInfo = holes[holeId - 1];
-      return mergeAggregateStats(
-        soFar,
-        calculateAggregateStatsForHole(holeInfo, scorecardHole.shots)
-      );
-    },
-    {
-      birde: 0,
-      bogey: 0,
-      doubleBogey: 0,
-      doubleEagle: 0,
-      eagle: 0,
-      hio: 0,
-      par: 0
-    }
-  );
+  return playerScorecardRound.holes.reduce((soFar, scorecardHole) => {
+    const holeId = parseInt(scorecardHole.cNum, 10);
+    const holeInfo = holes[holeId - 1];
+    return mergeAggregateStats(
+      soFar,
+      calculateAggregateStatsForHole(holeInfo, scorecardHole.shots)
+    );
+  }, getEmptyAggregateStats());
 }
 
 function calculateAggregateStatsForHole(
@@ -94,7 +77,9 @@ function calculateAggregateStatsForHole(
     doubleEagle: effective === 3 ? 1 : 0,
     eagle: effective === -2 ? 1 : 0,
     hio: numberOfShots === 1 ? 1 : 0,
-    par: effective === 0 ? 1 : 0
+    par: effective === 0 ? 1 : 0,
+    ballInWater: shots.filter(s => s.to === "OWA").length,
+    missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0
   };
 }
 
@@ -108,14 +93,20 @@ function mergeAggregateStats(
       (soFar[key] as any) = a[key] + b[key];
       return soFar;
     },
-    {
-      birde: 0,
-      bogey: 0,
-      doubleBogey: 0,
-      doubleEagle: 0,
-      eagle: 0,
-      hio: 0,
-      par: 0
-    }
+    getEmptyAggregateStats()
   );
+}
+
+function getEmptyAggregateStats(): PlayerAggregateStats {
+  return {
+    birde: 0,
+    bogey: 0,
+    doubleBogey: 0,
+    doubleEagle: 0,
+    eagle: 0,
+    hio: 0,
+    par: 0,
+    ballInWater: 0,
+    missedGir: 0
+  };
 }

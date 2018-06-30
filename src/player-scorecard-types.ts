@@ -19,4 +19,5 @@ export interface PlayerScorecardShot {
   readonly n: string;
   readonly putt: "y" | "n";
   readonly cup: "y" | "n";
+  to: "OWA" | "OGR";
 }
