@@ -5,6 +5,7 @@ import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
 
 const playerData: PlayerResponse = require("../player.json");
 const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
+
 const playerAggregates = ["25198", "25632", "29420"].map(pId => {
   const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
     p => p.player_id === pId
@@ -35,12 +36,26 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
     <table>
       <thead>
         <th>Player</th>
+        <th>hio</th>
+        <th>doubleEagle</th>
+        <th>eagle</th>
+        <th>birde</th>
+        <th>par</th>
+        <th>bogey</th>
+        <th>doubleBogey</th>
       </thead>
       <tbody>
         {playerAggregates.map(playerAggregate => {
           return (
             <tr key={playerAggregate.id}>
               <td>{playerAggregate.playerName}</td>
+              <td>{playerAggregate.stats.hio}</td>
+              <td>{playerAggregate.stats.doubleEagle}</td>
+              <td>{playerAggregate.stats.eagle}</td>
+              <td>{playerAggregate.stats.birde}</td>
+              <td>{playerAggregate.stats.par}</td>
+              <td>{playerAggregate.stats.bogey}</td>
+              <td>{playerAggregate.stats.doubleBogey}</td>
             </tr>
           );
         })}
