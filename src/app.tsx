@@ -2,15 +2,22 @@ import * as React from "react";
 import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
+import { mockPlayerData } from "./mock-data";
 
 const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
+
+const holes = leaderboardReponse.leaderboard.courses[0].holes.map(h => ({
+  id: h.hole_id,
+  par: h.round[0].par
+}));
 
 const playerAggregates = ["25198", "25632", "29420"].map(pId => {
   const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
     p => p.player_id === pId
   )!;
-  const playerScorecard: PlayerScorecardResponse = require("../player.json");
-  return getPlayerAggregate(leaderboardPlayer, playerScorecard);
+  const playerScorecard: PlayerScorecardResponse = mockPlayerData[pId];
+  console.log(playerScorecard);
+  return getPlayerAggregate(holes, leaderboardPlayer, playerScorecard);
 });
 
 interface Props {}
