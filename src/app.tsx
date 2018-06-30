@@ -51,6 +51,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
         <th>bogey</th>
         <th>doubleBogey</th>
         <th>ball in water</th>
+        <th>Out of bounds</th>
         <th>missed gir</th>
       </thead>
       <tbody>
@@ -66,6 +67,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
               <td>{playerAggregate.stats.bogey}</td>
               <td>{playerAggregate.stats.doubleBogey}</td>
               <td>{playerAggregate.stats.ballInWater}</td>
+              <td>{playerAggregate.stats.outOfBounds}</td>
               <td>{playerAggregate.stats.missedGir}</td>
             </tr>
           );

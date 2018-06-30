@@ -20,6 +20,7 @@ export interface PlayerAggregateStats {
   readonly doubleBogey: number;
   readonly ballInWater: number;
   readonly missedGir: number;
+  readonly outOfBounds: number;
 }
 export interface PlayerAggregate {
   readonly id: string;
@@ -79,6 +80,7 @@ function calculateAggregateStatsForHole(
     hio: numberOfShots === 1 ? 1 : 0,
     par: effective === 0 ? 1 : 0,
     ballInWater: shots.filter(s => s.to === "OWA").length,
+    outOfBounds: shots.filter(s => s.to === "OTB").length,
     missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0
   };
 }
@@ -107,6 +109,7 @@ function getEmptyAggregateStats(): PlayerAggregateStats {
     hio: 0,
     par: 0,
     ballInWater: 0,
-    missedGir: 0
+    missedGir: 0,
+    outOfBounds: 0
   };
 }
