@@ -2,7 +2,7 @@ import * as React from "react";
 import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
-import { mockPlayerData } from "./mock-data";
+import styled from "styled-components";
 
 // const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
 const leaderboardUrl =
@@ -109,27 +109,39 @@ export class App extends React.Component<Props, State> {
   }
 }
 
+const StatsTable = styled.table`
+  table-layout: fixed;
+  border: 1px solid purple;
+  border-collapse: collapse;
+
+  td,
+  th {
+    padding: 5px;
+    text-align: center;
+  }
+`;
+
 interface MyPlayersProps {
   readonly playerAggregates: ReadonlyArray<PlayerAggregate>;
 }
 
 function MyPlayers({ playerAggregates }: MyPlayersProps) {
   return (
-    <table>
+    <StatsTable>
       <thead>
         <th>Player</th>
-        <th>hio</th>
-        <th>doubleEagle</th>
-        <th>eagle</th>
-        <th>birde</th>
-        <th>par</th>
-        <th>bogey</th>
-        <th>doubleBogey</th>
-        <th>ball in water</th>
+        <th>Hio</th>
+        <th>Double eagle</th>
+        <th>Eagle</th>
+        <th>Birde</th>
+        <th>Par</th>
+        <th>Bogey</th>
+        <th>Double bogey</th>
+        <th>Ball in water</th>
         <th>Out of bounds</th>
-        <th>missed gir</th>
-        <th>three putt</th>
-        <th>bunker</th>
+        <th>Missed GIR</th>
+        <th>Three putt</th>
+        <th>Bunker</th>
       </thead>
       <tbody>
         {playerAggregates.map(playerAggregate => {
@@ -152,7 +164,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
           );
         })}
       </tbody>
-    </table>
+    </StatsTable>
   );
 }
 
