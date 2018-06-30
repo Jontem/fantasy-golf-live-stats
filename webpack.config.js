@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
   mode: "development",
   devtool: "inline-source-map",
-  entry: "./src/index.ts",
+  entry: "./src/index.tsx",
   output: {
     filename: "main.js",
     path: path.resolve(__dirname, "dist")
