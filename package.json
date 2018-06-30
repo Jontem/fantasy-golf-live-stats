@@ -1,0 +1,16 @@
+{
+  "name": "fantasy-golf-live-stats",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.14.0",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4"
+  },
+  "scripts": {
+    "start": "webpack-dev-server"
+  }
+}
