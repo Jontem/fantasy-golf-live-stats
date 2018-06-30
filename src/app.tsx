@@ -1,16 +1,16 @@
 import * as React from "react";
-import { PlayerResponse, Player } from "./player-json-types";
+import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
 
-const playerData: PlayerResponse = require("../player.json");
 const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
 
 const playerAggregates = ["25198", "25632", "29420"].map(pId => {
   const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
     p => p.player_id === pId
   )!;
-  return getPlayerAggregate(leaderboardPlayer);
+  const playerScorecard: PlayerScorecardResponse = require("../player.json");
+  return getPlayerAggregate(leaderboardPlayer, playerScorecard);
 });
 
 interface Props {}
@@ -64,7 +64,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
   );
 }
 
-interface PlayerTableProps {
+/* interface PlayerTableProps {
   readonly players: ReadonlyArray<Player>;
 }
 
@@ -86,3 +86,4 @@ function PlayerTable({ players }: PlayerTableProps): JSX.Element {
     </table>
   );
 }
+ */

@@ -1,4 +1,5 @@
 import { LeaderBoardPlayer } from "./leaderboard-json-types";
+import { PlayerScorecardResponse } from "./player-scorecard-types";
 
 export interface PlayerAggregate {
   readonly id: string;
@@ -15,7 +16,8 @@ export interface PlayerAggregate {
 }
 
 export function getPlayerAggregate(
-  leaderBoardPlayer: LeaderBoardPlayer
+  leaderBoardPlayer: LeaderBoardPlayer,
+  playerScorecard: PlayerScorecardResponse
 ): PlayerAggregate {
   return {
     id: leaderBoardPlayer.player_id,
