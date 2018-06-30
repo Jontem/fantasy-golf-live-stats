@@ -4,33 +4,109 @@ import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
 import { mockPlayerData } from "./mock-data";
 
-const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
+// const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
+const leaderboardUrl =
+  "https://statdata.pgatour.com/r/471/2018/leaderboard-v2.json";
 
-const holes = leaderboardReponse.leaderboard.courses[0].holes.map(h => ({
+const getPlayerScorecardUrl = (playerId: string) =>
+  `https://statdata.pgatour.com/r/471/2018/scorecards/${playerId}.json`;
+
+const players = ["25198", "25632", "29420", "08793"];
+
+/* const holes = leaderboardReponse.leaderboard.courses[0].holes.map(h => ({
   id: h.hole_id,
   par: h.round[0].par
 }));
 
-const playerAggregates = ["25198", "25632", "29420"].map(pId => {
+const playerAggregates = ["25198", "25632", "29420", "08793"].map(pId => {
   const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
     p => p.player_id === pId
   )!;
   const playerScorecard: PlayerScorecardResponse = mockPlayerData[pId];
   console.log(playerScorecard);
   return getPlayerAggregate(holes, leaderboardPlayer, playerScorecard);
-});
+}); */
 
 interface Props {}
 
-export function App({  }: Props): JSX.Element {
-  //   console.log(playerData);
-  return (
-    <div>
-      <h1>Stats</h1>
-      <MyPlayers playerAggregates={playerAggregates} />
-      {/* <PlayerTable players={playerData.tournament.players} /> */}
-    </div>
-  );
+interface State {
+  readonly leaderboard: LeaderBoardResponse | undefined;
+  readonly playerAggregates: ReadonlyArray<PlayerAggregate> | undefined;
+}
+
+export class App extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      leaderboard: undefined,
+      playerAggregates: undefined
+    };
+  }
+
+  componentDidCatch?(error: Error, errorInfo: React.ErrorInfo) {
+    console.log(error);
+    console.log(errorInfo);
+  }
+
+  componentDidMount() {
+    const promises = [
+      fetch(leaderboardUrl).then(res => res.json()),
+      ...players.map(s =>
+        fetch(getPlayerScorecardUrl(s)).then(res => res.json())
+      )
+    ];
+
+    Promise.all(promises)
+      .then(datas => {
+        const [leaderboard, ...playerScorecardResponses] = datas;
+        const leaderboardReponse = leaderboard as LeaderBoardResponse;
+
+        const holes = leaderboardReponse.leaderboard.courses[0].holes.map(
+          h => ({
+            id: h.hole_id,
+            par: h.round[0].par
+          })
+        );
+
+        const playerAggregates = (playerScorecardResponses as ReadonlyArray<
+          PlayerScorecardResponse
+        >).map(r => {
+          const playerId = r.p.id;
+          const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
+            p => p.player_id === playerId
+          )!;
+          console.log(r);
+          return getPlayerAggregate(holes, leaderboardPlayer, r);
+        });
+
+        this.setState({
+          leaderboard,
+          playerAggregates
+        });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
+  render() {
+    const { playerAggregates } = this.state;
+    if (playerAggregates === undefined) {
+      return (
+        <div>
+          <h1>Loading...</h1>
+        </div>
+      );
+    }
+    //   console.log(playerData);
+    return (
+      <div>
+        <h1>Stats</h1>
+        <MyPlayers playerAggregates={playerAggregates} />
+        {/* <PlayerTable players={playerData.tournament.players} /> */}
+      </div>
+    );
+  }
 }
 
 interface MyPlayersProps {
@@ -38,7 +114,6 @@ interface MyPlayersProps {
 }
 
 function MyPlayers({ playerAggregates }: MyPlayersProps) {
-  console.log(leaderboardReponse);
   return (
     <table>
       <thead>
