@@ -23,5 +23,6 @@ export interface PlayerScorecardShot {
   to:
     | "OWA" /* Water */
     | "OGR" /* GREEN */
-    | "OTB" /* To bound?  when t = p and to = OTB, ot of bounds?*/;
+    | "OTB" /* To bound?  when t = p and to = OTB, ot of bounds?*/
+    | "OST" /* Fairway bunker */;
 }
