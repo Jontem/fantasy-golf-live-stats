@@ -1,7 +1,16 @@
 import * as React from "react";
-import { PlayerData, Player } from "./player-json-types";
+import { PlayerResponse, Player } from "./player-json-types";
+import { LeaderBoardResponse } from "./leaderboard-json-types";
+import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
 
-const playerData: PlayerData = require("../player.json");
+const playerData: PlayerResponse = require("../player.json");
+const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
+const playerAggregates = ["25198", "25632", "29420"].map(pId => {
+  const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
+    p => p.player_id === pId
+  )!;
+  return getPlayerAggregate(leaderboardPlayer);
+});
 
 interface Props {}
 
@@ -10,15 +19,41 @@ export function App({  }: Props): JSX.Element {
   return (
     <div>
       <h1>Stats</h1>
-      <PlayerTable players={playerData.tournament.players} />
+      <MyPlayers playerAggregates={playerAggregates} />
+      {/* <PlayerTable players={playerData.tournament.players} /> */}
     </div>
+  );
+}
+
+interface MyPlayersProps {
+  readonly playerAggregates: ReadonlyArray<PlayerAggregate>;
+}
+
+function MyPlayers({ playerAggregates }: MyPlayersProps) {
+  console.log(leaderboardReponse);
+  return (
+    <table>
+      <thead>
+        <th>Player</th>
+      </thead>
+      <tbody>
+        {playerAggregates.map(playerAggregate => {
+          return (
+            <tr key={playerAggregate.id}>
+              <td>{playerAggregate.playerName}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
 interface PlayerTableProps {
   readonly players: ReadonlyArray<Player>;
 }
-export function PlayerTable({ players }: PlayerTableProps): JSX.Element {
+
+function PlayerTable({ players }: PlayerTableProps): JSX.Element {
   return (
     <table>
       <thead>

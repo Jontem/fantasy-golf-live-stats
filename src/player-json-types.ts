@@ -1,4 +1,4 @@
-export interface PlayerData {
+export interface PlayerResponse {
   readonly tournament: PlayerTournament;
 }
 
