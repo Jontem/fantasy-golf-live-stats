@@ -17,7 +17,11 @@ export interface PlayerScorecardHole {
 
 export interface PlayerScorecardShot {
   readonly n: string;
-  readonly putt: "y" | "n";
+  readonly putt: "3";
   readonly cup: "y" | "n";
-  to: "OWA" /* Water */ | "OGR" /* GREEN */ | "OTB" /* out of bounds */;
+  readonly t: "s" /* stroke */ | "p" /* penalty */;
+  to:
+    | "OWA" /* Water */
+    | "OGR" /* GREEN */
+    | "OTB" /* To bound?  when t = p and to = OTB, ot of bounds?*/;
 }

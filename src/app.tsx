@@ -53,6 +53,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
         <th>ball in water</th>
         <th>Out of bounds</th>
         <th>missed gir</th>
+        <th>three putt</th>
       </thead>
       <tbody>
         {playerAggregates.map(playerAggregate => {
@@ -69,6 +70,7 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
               <td>{playerAggregate.stats.ballInWater}</td>
               <td>{playerAggregate.stats.outOfBounds}</td>
               <td>{playerAggregate.stats.missedGir}</td>
+              <td>{playerAggregate.stats.threePutt}</td>
             </tr>
           );
         })}

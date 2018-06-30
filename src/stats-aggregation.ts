@@ -21,6 +21,7 @@ export interface PlayerAggregateStats {
   readonly ballInWater: number;
   readonly missedGir: number;
   readonly outOfBounds: number;
+  readonly threePutt: number;
 }
 export interface PlayerAggregate {
   readonly id: string;
@@ -80,8 +81,9 @@ function calculateAggregateStatsForHole(
     hio: numberOfShots === 1 ? 1 : 0,
     par: effective === 0 ? 1 : 0,
     ballInWater: shots.filter(s => s.to === "OWA").length,
-    outOfBounds: shots.filter(s => s.to === "OTB").length,
-    missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0
+    outOfBounds: shots.filter(s => s.to === "OTB" && s.t === "p").length,
+    missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
+    threePutt: shots.findIndex(s => s.putt === "3") > -1 ? 1 : 0
   };
 }
 
@@ -110,6 +112,7 @@ function getEmptyAggregateStats(): PlayerAggregateStats {
     par: 0,
     ballInWater: 0,
     missedGir: 0,
-    outOfBounds: 0
+    outOfBounds: 0,
+    threePutt: 0
   };
 }
