@@ -23,6 +23,7 @@ export interface PlayerAggregateStats {
   readonly outOfBounds: number;
   readonly threePutt: number;
   readonly bunker: number;
+  readonly sandSave: number;
 }
 export interface PlayerAggregate {
   readonly id: string;
@@ -92,7 +93,8 @@ function calculateAggregateStatsForHole(
     outOfBounds: shots.filter(s => s.to === "OTB" && s.t === "p").length,
     missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
     threePutt: shots.findIndex(s => s.putt === "3") > -1 ? 1 : 0,
-    bunker: shots.filter(s => s.to === "OST" || s.to.startsWith("EG")).length
+    bunker: shots.filter(s => s.to === "OST" || s.to.startsWith("EG")).length,
+    sandSave: getSandSaves(shots)
   };
 }
 
@@ -123,6 +125,29 @@ function getEmptyAggregateStats(): PlayerAggregateStats {
     missedGir: 0,
     outOfBounds: 0,
     threePutt: 0,
-    bunker: 0
+    bunker: 0,
+    sandSave: 0
   };
+}
+
+function getSandSaves(shots: ReadonlyArray<PlayerScorecardShot>): number {
+  const toGreenBunkerShot = shots
+    .concat()
+    .reverse()
+    .find(s => s.to.startsWith("EG"));
+  toGreenBunkerShot;
+  if (toGreenBunkerShot === undefined) {
+    return 0;
+  }
+
+  console.log("toGreenBunkerShot", toGreenBunkerShot);
+  console.log("totalShots", shots.length);
+  if (shots.length - parseInt(toGreenBunkerShot.n, 10) > 2) {
+    console.log("No sandy");
+    return 0;
+  }
+
+  // debugger;
+  console.log("sandy");
+  return 1;
 }
