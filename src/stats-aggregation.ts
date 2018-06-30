@@ -59,6 +59,12 @@ function getRoundStats(
   return playerScorecardRound.holes.reduce((soFar, scorecardHole) => {
     const holeId = parseInt(scorecardHole.cNum, 10);
     const holeInfo = holes[holeId - 1];
+
+    // Check if player have yet finnished hole
+    if (scorecardHole.sc.length === 0) {
+      return soFar;
+    }
+
     return mergeAggregateStats(
       soFar,
       calculateAggregateStatsForHole(holeInfo, scorecardHole.shots)
@@ -73,14 +79,15 @@ function calculateAggregateStatsForHole(
   const numberOfShots = shots.length;
   const par = hole.par;
   const effective = numberOfShots - par;
+
   return {
+    hio: numberOfShots === 1 ? 1 : 0,
+    doubleEagle: effective === -3 ? 1 : 0,
+    eagle: effective === -2 ? 1 : 0,
     birde: effective === -1 ? 1 : 0,
+    par: effective === 0 ? 1 : 0,
     bogey: effective === 1 ? 1 : 0,
     doubleBogey: effective >= 2 ? 1 : 0,
-    doubleEagle: effective === 3 ? 1 : 0,
-    eagle: effective === -2 ? 1 : 0,
-    hio: numberOfShots === 1 ? 1 : 0,
-    par: effective === 0 ? 1 : 0,
     ballInWater: shots.filter(s => s.to === "OWA").length,
     outOfBounds: shots.filter(s => s.to === "OTB" && s.t === "p").length,
     missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,

@@ -12,6 +12,7 @@ export interface PlayerScorecardRound {
 
 export interface PlayerScorecardHole {
   readonly cNum: string;
+  readonly sc: string;
   readonly shots: ReadonlyArray<PlayerScorecardShot>;
 }
 
