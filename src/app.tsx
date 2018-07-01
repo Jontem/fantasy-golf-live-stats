@@ -10,7 +10,6 @@ import {
 } from "./stats-aggregation";
 import { calculatePoints } from "./calculate-points";
 
-// const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
 const leaderboardUrl =
   "https://statdata.pgatour.com/r/471/2018/leaderboard-v2.json";
 
@@ -18,20 +17,6 @@ const getPlayerScorecardUrl = (playerId: string) =>
   `https://statdata.pgatour.com/r/471/2018/scorecards/${playerId}.json`;
 
 const players = ["25198", "25632", "29420", "08793"];
-
-/* const holes = leaderboardReponse.leaderboard.courses[0].holes.map(h => ({
-  id: h.hole_id,
-  par: h.round[0].par
-}));
-
-const playerAggregates = ["25198", "25632", "29420", "08793"].map(pId => {
-  const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
-    p => p.player_id === pId
-  )!;
-  const playerScorecard: PlayerScorecardResponse = mockPlayerData[pId];
-  console.log(playerScorecard);
-  return getPlayerAggregate(holes, leaderboardPlayer, playerScorecard);
-}); */
 
 interface Props {}
 
