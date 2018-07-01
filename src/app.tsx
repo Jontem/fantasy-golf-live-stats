@@ -205,6 +205,95 @@ function PlayerAggregate({
               </tr>
             );
           })}
+          <tr>
+            <td>Total</td>
+            <td />
+            <td>TODO</td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.hio.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.doubleEagle.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.eagle.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.birdie.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.par.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.bogey.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.doubleBogey.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.ballInWater.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.outOfBounds.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.missedGir.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.threePutt.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.bunker.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.sandSave.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + calculatePoints(current),
+                0
+              )}
+            </td>
+          </tr>
         </tbody>
       </StatsTable>
     </div>
@@ -216,27 +305,3 @@ interface ValueRowProps {
 function ValueRow({ stat: { value, holes } }: ValueRowProps): JSX.Element {
   return <td title={holes.join(", ")}>{value}</td>;
 }
-
-/* interface PlayerTableProps {
-  readonly players: ReadonlyArray<Player>;
-}
-
-function PlayerTable({ players }: PlayerTableProps): JSX.Element {
-  return (
-    <table>
-      <thead>
-        <th>Player</th>
-        {players[0].stats.map(s => <th>{s.name}</th>)}
-      </thead>
-      <tbody>
-        {players.map(p => (
-          <tr key={p.pid}>
-            <td>{p.pn}</td>
-            {p.stats.map(s => <td key={s.statId}>{s.tValue}</td>)}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
- */
