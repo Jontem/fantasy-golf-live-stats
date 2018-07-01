@@ -200,7 +200,19 @@ function PlayerAggregate({
           <tr>
             <td>Total</td>
             <td />
-            <td>TODO</td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) =>
+                  soFar +
+                  getToPar(
+                    holes,
+                    current.shots,
+                    current.currentHole,
+                    current.finnished
+                  ),
+                0
+              )}
+            </td>
             <td>
               {rounds.reduce(
                 (soFar, current) => soFar + current.stats.hio.value,

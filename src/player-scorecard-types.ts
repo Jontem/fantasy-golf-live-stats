@@ -20,7 +20,7 @@ export interface PlayerScorecardShot {
   readonly n: string;
   readonly putt: "3";
   readonly cup: "y" | "n";
-  readonly t: "s" /* stroke */ | "p" /* penalty */;
+  readonly t: "S" /* stroke */ | "P" /* penalty */ | "D" /* Drop */;
   to:
     | "OWA" /* Water */
     | "OGR" /* GREEN */

@@ -67,7 +67,10 @@ function getPlayerAggregateRounds(
       id: round,
       shots: r.holes
         .filter(h => h.sc.length > 0)
-        .reduce((soFar, current) => soFar + current.shots.length, 0),
+        .reduce(
+          (soFar, current) => soFar + getCountableShots(current.shots).length,
+          0
+        ),
       finnished: r.holes.every(h => h.sc.length > 0),
       currentHole: getCurrentHole(r.holes),
       stats: getRoundStats(holes, r)
@@ -99,7 +102,8 @@ function calculateAggregateStatsForHole(
   hole: Hole,
   shots: ReadonlyArray<PlayerScorecardShot>
 ): PlayerAggregateRoundStats {
-  const numberOfShots = shots.length;
+  const countableShots = getCountableShots(shots);
+  const numberOfShots = countableShots.length;
   const par = hole.par;
   const effective = numberOfShots - par;
 
@@ -118,26 +122,29 @@ function calculateAggregateStatsForHole(
       hole.id
     ),
     ballInWater: createPlayerAggregateRoundStat(
-      shots.filter(s => s.to === "OWA").length,
+      countableShots.filter(s => s.to === "OWA").length,
       hole.id
     ),
     outOfBounds: createPlayerAggregateRoundStat(
-      shots.filter(s => s.to === "OTB" && s.t === "p").length,
+      countableShots.filter(s => s.to === "OTB" && s.t === "P").length,
       hole.id
     ),
     missedGir: createPlayerAggregateRoundStat(
-      shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
+      countableShots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
       hole.id
     ),
     threePutt: createPlayerAggregateRoundStat(
-      shots.findIndex(s => s.putt === "3") > -1 ? 1 : 0,
+      countableShots.findIndex(s => s.putt === "3") > -1 ? 1 : 0,
       hole.id
     ),
     bunker: createPlayerAggregateRoundStat(
       shots.filter(s => s.to === "OST" || s.to.startsWith("EG")).length,
       hole.id
     ),
-    sandSave: createPlayerAggregateRoundStat(getSandSaves(shots), hole.id)
+    sandSave: createPlayerAggregateRoundStat(
+      getSandSaves(countableShots),
+      hole.id
+    )
   };
 }
 
@@ -228,4 +235,10 @@ function getCurrentHole(holes: ReadonlyArray<PlayerScorecardHole>): number {
   }
 
   return 1;
+}
+
+function getCountableShots(
+  shots: ReadonlyArray<PlayerScorecardShot>
+): ReadonlyArray<PlayerScorecardShot> {
+  return shots.filter(s => s.t !== "D");
 }
