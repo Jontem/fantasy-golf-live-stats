@@ -1,17 +1,23 @@
 import { exhaustiveCheck } from "ts-exhaustive-check";
-import { PlayerAggregateStats } from "./stats-aggregation";
+import {
+  PlayerAggregateRound,
+  PlayerAggregateRoundStats
+} from "./stats-aggregation";
 
-export function calculatePoints(stats: PlayerAggregateStats): number {
-  const keys: ReadonlyArray<keyof PlayerAggregateStats> = Object.keys(
-    stats
+export function calculatePoints(round: PlayerAggregateRound): number {
+  const keys: ReadonlyArray<keyof PlayerAggregateRoundStats> = Object.keys(
+    round.stats
   ) as any;
 
-  return keys.reduce((soFar, current) => soFar + getPoints(stats, current), 0);
+  return keys.reduce(
+    (soFar, current) => soFar + getPoints(round.stats, current),
+    0
+  );
 }
 
 function getPoints(
-  stats: PlayerAggregateStats,
-  key: keyof PlayerAggregateStats
+  stats: PlayerAggregateRoundStats,
+  key: keyof PlayerAggregateRoundStats
 ): number {
   switch (key) {
     case "hio": {

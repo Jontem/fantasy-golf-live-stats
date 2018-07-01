@@ -10,7 +10,7 @@ export interface Hole {
   par: number;
 }
 
-export interface PlayerAggregateStats {
+export interface PlayerAggregateRoundStats {
   readonly hio: number;
   readonly doubleEagle: number;
   readonly eagle: number;
@@ -25,13 +25,18 @@ export interface PlayerAggregateStats {
   readonly bunker: number;
   readonly sandSave: number;
 }
+
+export interface PlayerAggregateRound {
+  readonly id: number;
+  readonly stats: PlayerAggregateRoundStats;
+}
 export interface PlayerAggregate {
   readonly id: string;
   readonly playerName: string;
-  readonly stats: PlayerAggregateStats;
+  readonly rounds: ReadonlyArray<PlayerAggregateRound>;
 }
 
-export function getPlayerAggregate(
+export function getPlayerAggregates(
   holes: ReadonlyArray<Hole>,
   leaderBoardPlayer: LeaderBoardPlayer,
   playerScorecard: PlayerScorecardResponse
@@ -41,22 +46,27 @@ export function getPlayerAggregate(
     playerName: `${leaderBoardPlayer.player_bio.first_name} ${
       leaderBoardPlayer.player_bio.last_name
     }`,
-    stats: getPlayerAggregateStats(holes, playerScorecard)
+    rounds: getPlayerAggregateRounds(holes, playerScorecard)
   };
 }
 
-function getPlayerAggregateStats(
+function getPlayerAggregateRounds(
   holes: ReadonlyArray<Hole>,
   playerScorecard: PlayerScorecardResponse
-): PlayerAggregateStats {
-  const roundStats = playerScorecard.p.rnds.map(r => getRoundStats(holes, r));
-  return roundStats.reduce(mergeAggregateStats);
+): ReadonlyArray<PlayerAggregateRound> {
+  return playerScorecard.p.rnds.map(r => {
+    const round = parseInt(r.n, 10);
+    return {
+      id: round,
+      stats: getRoundStats(holes, r)
+    };
+  });
 }
 
 function getRoundStats(
   holes: ReadonlyArray<Hole>,
   playerScorecardRound: PlayerScorecardRound
-): PlayerAggregateStats {
+): PlayerAggregateRoundStats {
   return playerScorecardRound.holes.reduce((soFar, scorecardHole) => {
     const holeId = parseInt(scorecardHole.cNum, 10);
     const holeInfo = holes[holeId - 1];
@@ -76,7 +86,7 @@ function getRoundStats(
 function calculateAggregateStatsForHole(
   hole: Hole,
   shots: ReadonlyArray<PlayerScorecardShot>
-): PlayerAggregateStats {
+): PlayerAggregateRoundStats {
   const numberOfShots = shots.length;
   const par = hole.par;
   const effective = numberOfShots - par;
@@ -99,12 +109,17 @@ function calculateAggregateStatsForHole(
 }
 
 function mergeAggregateStats(
-  a: PlayerAggregateStats,
-  b: PlayerAggregateStats
-): PlayerAggregateStats {
-  const keys: ReadonlyArray<keyof PlayerAggregateStats> = Object.keys(a) as any;
+  a: PlayerAggregateRoundStats,
+  b: PlayerAggregateRoundStats
+): PlayerAggregateRoundStats {
+  const keys: ReadonlyArray<keyof PlayerAggregateRoundStats> = Object.keys(
+    a
+  ) as any;
   return keys.reduce(
-    (soFar: PlayerAggregateStats, key: keyof PlayerAggregateStats) => {
+    (
+      soFar: PlayerAggregateRoundStats,
+      key: keyof PlayerAggregateRoundStats
+    ) => {
       (soFar[key] as any) = a[key] + b[key];
       return soFar;
     },
@@ -112,7 +127,7 @@ function mergeAggregateStats(
   );
 }
 
-function getEmptyAggregateStats(): PlayerAggregateStats {
+function getEmptyAggregateStats(): PlayerAggregateRoundStats {
   return {
     birdie: 0,
     bogey: 0,

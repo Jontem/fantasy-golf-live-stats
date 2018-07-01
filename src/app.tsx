@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
-import { getPlayerAggregate, PlayerAggregate } from "./stats-aggregation";
+import { getPlayerAggregates, PlayerAggregate } from "./stats-aggregation";
 import { calculatePoints } from "./calculate-points";
 
 // const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
@@ -77,7 +77,7 @@ export class App extends React.Component<Props, State> {
             p => p.player_id === playerId
           )!;
           console.log(r);
-          return getPlayerAggregate(holes, leaderboardPlayer, r);
+          return getPlayerAggregates(holes, leaderboardPlayer, r);
         });
 
         this.setState({
@@ -128,48 +128,67 @@ interface MyPlayersProps {
 
 function MyPlayers({ playerAggregates }: MyPlayersProps) {
   return (
-    <StatsTable>
-      <thead>
-        <th>Player</th>
-        <th>Hio</th>
-        <th>Double eagle</th>
-        <th>Eagle</th>
-        <th>Birde</th>
-        <th>Par</th>
-        <th>Bogey</th>
-        <th>Double bogey</th>
-        <th>Ball in water</th>
-        <th>Out of bounds</th>
-        <th>Missed GIR</th>
-        <th>Three putt</th>
-        <th>Bunker</th>
-        <th>Sand save</th>
-        <th>Points</th>
-      </thead>
-      <tbody>
-        {playerAggregates.map(playerAggregate => {
-          return (
-            <tr key={playerAggregate.id}>
-              <td>{playerAggregate.playerName}</td>
-              <td>{playerAggregate.stats.hio}</td>
-              <td>{playerAggregate.stats.doubleEagle}</td>
-              <td>{playerAggregate.stats.eagle}</td>
-              <td>{playerAggregate.stats.birdie}</td>
-              <td>{playerAggregate.stats.par}</td>
-              <td>{playerAggregate.stats.bogey}</td>
-              <td>{playerAggregate.stats.doubleBogey}</td>
-              <td>{playerAggregate.stats.ballInWater}</td>
-              <td>{playerAggregate.stats.outOfBounds}</td>
-              <td>{playerAggregate.stats.missedGir}</td>
-              <td>{playerAggregate.stats.threePutt}</td>
-              <td>{playerAggregate.stats.bunker}</td>
-              <td>{playerAggregate.stats.sandSave}</td>
-              <td>{calculatePoints(playerAggregate.stats)}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </StatsTable>
+    <div>
+      {playerAggregates.map(p => (
+        <PlayerAggregate key={p.id} playerAggregate={p} />
+      ))}
+    </div>
+  );
+}
+
+interface PlayerAggregateProps {
+  readonly playerAggregate: PlayerAggregate;
+}
+
+function PlayerAggregate({
+  playerAggregate: { playerName, rounds }
+}: PlayerAggregateProps): JSX.Element {
+  return (
+    <div>
+      <h2>{playerName}</h2>
+      <StatsTable>
+        <thead>
+          <th />
+          <th>Hio</th>
+          <th>Double eagle</th>
+          <th>Eagle</th>
+          <th>Birde</th>
+          <th>Par</th>
+          <th>Bogey</th>
+          <th>Double bogey</th>
+          <th>Ball in water</th>
+          <th>Out of bounds</th>
+          <th>Missed GIR</th>
+          <th>Three putt</th>
+          <th>Bunker</th>
+          <th>Sand save</th>
+          <th>Points</th>
+        </thead>
+        <tbody>
+          {rounds.map(round => {
+            return (
+              <tr key={round.id}>
+                <td>Round {round.id}</td>
+                <td>{round.stats.hio}</td>
+                <td>{round.stats.doubleEagle}</td>
+                <td>{round.stats.eagle}</td>
+                <td>{round.stats.birdie}</td>
+                <td>{round.stats.par}</td>
+                <td>{round.stats.bogey}</td>
+                <td>{round.stats.doubleBogey}</td>
+                <td>{round.stats.ballInWater}</td>
+                <td>{round.stats.outOfBounds}</td>
+                <td>{round.stats.missedGir}</td>
+                <td>{round.stats.threePutt}</td>
+                <td>{round.stats.bunker}</td>
+                <td>{round.stats.sandSave}</td>
+                <td>{calculatePoints(round)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </StatsTable>
+    </div>
   );
 }
 
