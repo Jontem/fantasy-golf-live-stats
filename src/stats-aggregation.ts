@@ -28,6 +28,9 @@ export interface PlayerAggregateRoundStats {
 
 export interface PlayerAggregateRound {
   readonly id: number;
+  readonly finnished: boolean;
+  readonly shots: number;
+  readonly currentHole: number;
   readonly stats: PlayerAggregateRoundStats;
 }
 export interface PlayerAggregate {
@@ -58,6 +61,16 @@ function getPlayerAggregateRounds(
     const round = parseInt(r.n, 10);
     return {
       id: round,
+      shots: r.holes.reduce(
+        (soFar, current) => soFar + current.shots.length,
+        0
+      ),
+      finnished: r.holes.every(h => h.sc.length > 0),
+      currentHole:
+        r.holes
+          .concat()
+          .reverse()
+          .findIndex(h => h.sc.length > 0) + 1,
       stats: getRoundStats(holes, r)
     };
   });

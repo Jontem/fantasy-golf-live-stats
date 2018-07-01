@@ -2,7 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
-import { getPlayerAggregates, PlayerAggregate } from "./stats-aggregation";
+import {
+  getPlayerAggregates,
+  PlayerAggregate,
+  Hole
+} from "./stats-aggregation";
 import { calculatePoints } from "./calculate-points";
 
 // const leaderboardReponse: LeaderBoardResponse = require("../leaderboard.json");
@@ -33,6 +37,7 @@ interface Props {}
 interface State {
   readonly leaderboard: LeaderBoardResponse | undefined;
   readonly playerAggregates: ReadonlyArray<PlayerAggregate> | undefined;
+  readonly holes: ReadonlyArray<Hole> | undefined;
 }
 
 export class App extends React.Component<Props, State> {
@@ -40,7 +45,8 @@ export class App extends React.Component<Props, State> {
     super(props);
     this.state = {
       leaderboard: undefined,
-      playerAggregates: undefined
+      playerAggregates: undefined,
+      holes: undefined
     };
   }
 
@@ -82,7 +88,8 @@ export class App extends React.Component<Props, State> {
 
         this.setState({
           leaderboard,
-          playerAggregates
+          playerAggregates,
+          holes
         });
       })
       .catch(error => {
@@ -91,19 +98,19 @@ export class App extends React.Component<Props, State> {
   }
 
   render() {
-    const { playerAggregates } = this.state;
-    if (playerAggregates === undefined) {
+    const { holes, playerAggregates } = this.state;
+    if (holes === undefined || playerAggregates === undefined) {
       return (
         <div>
           <h1>Loading...</h1>
         </div>
       );
     }
-    //   console.log(playerData);
+    const coursePar = holes.reduce((soFar, current) => soFar + current.par, 0);
     return (
       <div>
         <h1>Stats</h1>
-        <MyPlayers playerAggregates={playerAggregates} />
+        <MyPlayers playerAggregates={playerAggregates} coursePar={coursePar} />
         {/* <PlayerTable players={playerData.tournament.players} /> */}
       </div>
     );
@@ -124,13 +131,14 @@ const StatsTable = styled.table`
 
 interface MyPlayersProps {
   readonly playerAggregates: ReadonlyArray<PlayerAggregate>;
+  readonly coursePar: number;
 }
 
-function MyPlayers({ playerAggregates }: MyPlayersProps) {
+function MyPlayers({ coursePar, playerAggregates }: MyPlayersProps) {
   return (
     <div>
       {playerAggregates.map(p => (
-        <PlayerAggregate key={p.id} playerAggregate={p} />
+        <PlayerAggregate key={p.id} playerAggregate={p} coursePar={coursePar} />
       ))}
     </div>
   );
@@ -138,9 +146,11 @@ function MyPlayers({ playerAggregates }: MyPlayersProps) {
 
 interface PlayerAggregateProps {
   readonly playerAggregate: PlayerAggregate;
+  readonly coursePar: number;
 }
 
 function PlayerAggregate({
+  coursePar,
   playerAggregate: { playerName, rounds }
 }: PlayerAggregateProps): JSX.Element {
   return (
@@ -149,6 +159,8 @@ function PlayerAggregate({
       <StatsTable>
         <thead>
           <th />
+          <th>Hole / Par</th>
+          <th>To Par</th>
           <th>Hio</th>
           <th>Double eagle</th>
           <th>Eagle</th>
@@ -169,6 +181,8 @@ function PlayerAggregate({
             return (
               <tr key={round.id}>
                 <td>Round {round.id}</td>
+                <td>{round.finnished ? round.shots : round.currentHole}</td>
+                <td>{round.shots - coursePar}</td>
                 <td>{round.stats.hio}</td>
                 <td>{round.stats.doubleEagle}</td>
                 <td>{round.stats.eagle}</td>
