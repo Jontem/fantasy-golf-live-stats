@@ -21,43 +21,43 @@ function getPoints(
 ): number {
   switch (key) {
     case "hio": {
-      return stats[key] * 25;
+      return stats[key].value * 25;
     }
     case "doubleEagle": {
-      return stats[key] * 15;
+      return stats[key].value * 15;
     }
     case "eagle": {
-      return stats[key] * 7;
+      return stats[key].value * 7;
     }
     case "birdie": {
-      return stats[key] * 3;
+      return stats[key].value * 3;
     }
     case "par": {
-      return stats[key] * 1;
+      return stats[key].value * 1;
     }
     case "bogey": {
-      return stats[key] * -1;
+      return stats[key].value * -1;
     }
     case "doubleBogey": {
-      return stats[key] * -4;
+      return stats[key].value * -4;
     }
     case "ballInWater": {
-      return stats[key] * -7;
+      return stats[key].value * -7;
     }
     case "outOfBounds": {
-      return stats[key] * -10;
+      return stats[key].value * -10;
     }
     case "threePutt": {
-      return stats[key] * -3;
+      return stats[key].value * -3;
     }
     case "missedGir": {
-      return stats[key] * -1;
+      return stats[key].value * -1;
     }
     case "sandSave": {
-      return stats[key] * 2;
+      return stats[key].value * 2;
     }
     case "bunker": {
-      return stats[key] * -1;
+      return stats[key].value * -1;
     }
     default: {
       exhaustiveCheck(key);

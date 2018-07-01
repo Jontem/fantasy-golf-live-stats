@@ -9,21 +9,24 @@ export interface Hole {
   id: number;
   par: number;
 }
-
+export interface PlayerAggregateRoundStat {
+  readonly value: number;
+  readonly holes: ReadonlyArray<number>;
+}
 export interface PlayerAggregateRoundStats {
-  readonly hio: number;
-  readonly doubleEagle: number;
-  readonly eagle: number;
-  readonly birdie: number;
-  readonly par: number;
-  readonly bogey: number;
-  readonly doubleBogey: number;
-  readonly ballInWater: number;
-  readonly missedGir: number;
-  readonly outOfBounds: number;
-  readonly threePutt: number;
-  readonly bunker: number;
-  readonly sandSave: number;
+  readonly hio: PlayerAggregateRoundStat;
+  readonly doubleEagle: PlayerAggregateRoundStat;
+  readonly eagle: PlayerAggregateRoundStat;
+  readonly birdie: PlayerAggregateRoundStat;
+  readonly par: PlayerAggregateRoundStat;
+  readonly bogey: PlayerAggregateRoundStat;
+  readonly doubleBogey: PlayerAggregateRoundStat;
+  readonly ballInWater: PlayerAggregateRoundStat;
+  readonly missedGir: PlayerAggregateRoundStat;
+  readonly outOfBounds: PlayerAggregateRoundStat;
+  readonly threePutt: PlayerAggregateRoundStat;
+  readonly bunker: PlayerAggregateRoundStat;
+  readonly sandSave: PlayerAggregateRoundStat;
 }
 
 export interface PlayerAggregateRound {
@@ -105,19 +108,57 @@ function calculateAggregateStatsForHole(
   const effective = numberOfShots - par;
 
   return {
-    hio: numberOfShots === 1 ? 1 : 0,
-    doubleEagle: effective === -3 ? 1 : 0,
-    eagle: effective === -2 ? 1 : 0,
-    birdie: effective === -1 ? 1 : 0,
-    par: effective === 0 ? 1 : 0,
-    bogey: effective === 1 ? 1 : 0,
-    doubleBogey: effective >= 2 ? 1 : 0,
-    ballInWater: shots.filter(s => s.to === "OWA").length,
-    outOfBounds: shots.filter(s => s.to === "OTB" && s.t === "p").length,
-    missedGir: shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
-    threePutt: shots.findIndex(s => s.putt === "3") > -1 ? 1 : 0,
-    bunker: shots.filter(s => s.to === "OST" || s.to.startsWith("EG")).length,
-    sandSave: getSandSaves(shots)
+    hio: createPlayerAggregateRoundStat(numberOfShots === 1 ? 1 : 0, hole.id),
+    doubleEagle: createPlayerAggregateRoundStat(
+      effective === -3 ? 1 : 0,
+      hole.id
+    ),
+    eagle: createPlayerAggregateRoundStat(effective === -2 ? 1 : 0, hole.id),
+    birdie: createPlayerAggregateRoundStat(effective === -1 ? 1 : 0, hole.id),
+    par: createPlayerAggregateRoundStat(effective === 0 ? 1 : 0, hole.id),
+    bogey: createPlayerAggregateRoundStat(effective === 1 ? 1 : 0, hole.id),
+    doubleBogey: createPlayerAggregateRoundStat(
+      effective >= 2 ? 1 : 0,
+      hole.id
+    ),
+    ballInWater: createPlayerAggregateRoundStat(
+      shots.filter(s => s.to === "OWA").length,
+      hole.id
+    ),
+    outOfBounds: createPlayerAggregateRoundStat(
+      shots.filter(s => s.to === "OTB" && s.t === "p").length,
+      hole.id
+    ),
+    missedGir: createPlayerAggregateRoundStat(
+      shots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
+      hole.id
+    ),
+    threePutt: createPlayerAggregateRoundStat(
+      shots.findIndex(s => s.putt === "3") > -1 ? 1 : 0,
+      hole.id
+    ),
+    bunker: createPlayerAggregateRoundStat(
+      shots.filter(s => s.to === "OST" || s.to.startsWith("EG")).length,
+      hole.id
+    ),
+    sandSave: createPlayerAggregateRoundStat(getSandSaves(shots), hole.id)
+  };
+}
+
+function createPlayerAggregateRoundStat(
+  value: number,
+  hole: number
+): PlayerAggregateRoundStat {
+  if (value === 0) {
+    return {
+      holes: [],
+      value: 0
+    };
+  }
+
+  return {
+    value,
+    holes: [hole]
   };
 }
 
@@ -128,33 +169,37 @@ function mergeAggregateStats(
   const keys: ReadonlyArray<keyof PlayerAggregateRoundStats> = Object.keys(
     a
   ) as any;
-  return keys.reduce(
-    (
-      soFar: PlayerAggregateRoundStats,
-      key: keyof PlayerAggregateRoundStats
-    ) => {
-      (soFar[key] as any) = a[key] + b[key];
-      return soFar;
-    },
-    getEmptyAggregateStats()
-  );
+
+  let newStat = getEmptyAggregateStats();
+
+  for (const key of keys) {
+    newStat = {
+      ...newStat,
+      [key]: {
+        value: a[key].value + b[key].value,
+        holes: [...a[key].holes, ...b[key].holes]
+      }
+    };
+  }
+
+  return newStat;
 }
 
 function getEmptyAggregateStats(): PlayerAggregateRoundStats {
   return {
-    birdie: 0,
-    bogey: 0,
-    doubleBogey: 0,
-    doubleEagle: 0,
-    eagle: 0,
-    hio: 0,
-    par: 0,
-    ballInWater: 0,
-    missedGir: 0,
-    outOfBounds: 0,
-    threePutt: 0,
-    bunker: 0,
-    sandSave: 0
+    birdie: { value: 0, holes: [] },
+    bogey: { value: 0, holes: [] },
+    doubleBogey: { value: 0, holes: [] },
+    doubleEagle: { value: 0, holes: [] },
+    eagle: { value: 0, holes: [] },
+    hio: { value: 0, holes: [] },
+    par: { value: 0, holes: [] },
+    ballInWater: { value: 0, holes: [] },
+    missedGir: { value: 0, holes: [] },
+    outOfBounds: { value: 0, holes: [] },
+    threePutt: { value: 0, holes: [] },
+    bunker: { value: 0, holes: [] },
+    sandSave: { value: 0, holes: [] }
   };
 }
 

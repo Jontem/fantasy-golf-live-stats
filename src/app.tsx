@@ -5,6 +5,7 @@ import { LeaderBoardResponse } from "./leaderboard-json-types";
 import {
   getPlayerAggregates,
   PlayerAggregate,
+  PlayerAggregateRoundStat,
   Hole
 } from "./stats-aggregation";
 import { calculatePoints } from "./calculate-points";
@@ -65,32 +66,36 @@ export class App extends React.Component<Props, State> {
 
     Promise.all(promises)
       .then(datas => {
-        const [leaderboard, ...playerScorecardResponses] = datas;
-        const leaderboardReponse = leaderboard as LeaderBoardResponse;
+        try {
+          const [leaderboard, ...playerScorecardResponses] = datas;
+          const leaderboardReponse = leaderboard as LeaderBoardResponse;
 
-        const holes = leaderboardReponse.leaderboard.courses[0].holes.map(
-          h => ({
-            id: h.hole_id,
-            par: h.round[0].par
-          })
-        );
+          const holes = leaderboardReponse.leaderboard.courses[0].holes.map(
+            h => ({
+              id: h.hole_id,
+              par: h.round[0].par
+            })
+          );
 
-        const playerAggregates = (playerScorecardResponses as ReadonlyArray<
-          PlayerScorecardResponse
-        >).map(r => {
-          const playerId = r.p.id;
-          const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
-            p => p.player_id === playerId
-          )!;
-          console.log(r);
-          return getPlayerAggregates(holes, leaderboardPlayer, r);
-        });
+          const playerAggregates = (playerScorecardResponses as ReadonlyArray<
+            PlayerScorecardResponse
+          >).map(r => {
+            const playerId = r.p.id;
+            const leaderboardPlayer = leaderboardReponse.leaderboard.players.find(
+              p => p.player_id === playerId
+            )!;
+            console.log(r);
+            return getPlayerAggregates(holes, leaderboardPlayer, r);
+          });
 
-        this.setState({
-          leaderboard,
-          playerAggregates,
-          holes
-        });
+          this.setState({
+            leaderboard,
+            playerAggregates,
+            holes
+          });
+        } catch (e) {
+          debugger;
+        }
       })
       .catch(error => {
         console.error(error);
@@ -183,19 +188,19 @@ function PlayerAggregate({
                 <td>Round {round.id}</td>
                 <td>{round.finnished ? round.shots : round.currentHole}</td>
                 <td>{round.shots - coursePar}</td>
-                <td>{round.stats.hio}</td>
-                <td>{round.stats.doubleEagle}</td>
-                <td>{round.stats.eagle}</td>
-                <td>{round.stats.birdie}</td>
-                <td>{round.stats.par}</td>
-                <td>{round.stats.bogey}</td>
-                <td>{round.stats.doubleBogey}</td>
-                <td>{round.stats.ballInWater}</td>
-                <td>{round.stats.outOfBounds}</td>
-                <td>{round.stats.missedGir}</td>
-                <td>{round.stats.threePutt}</td>
-                <td>{round.stats.bunker}</td>
-                <td>{round.stats.sandSave}</td>
+                <ValueRow stat={round.stats.hio} />
+                <ValueRow stat={round.stats.doubleEagle} />
+                <ValueRow stat={round.stats.eagle} />
+                <ValueRow stat={round.stats.birdie} />
+                <ValueRow stat={round.stats.par} />
+                <ValueRow stat={round.stats.bogey} />
+                <ValueRow stat={round.stats.doubleBogey} />
+                <ValueRow stat={round.stats.ballInWater} />
+                <ValueRow stat={round.stats.outOfBounds} />
+                <ValueRow stat={round.stats.missedGir} />
+                <ValueRow stat={round.stats.threePutt} />
+                <ValueRow stat={round.stats.bunker} />
+                <ValueRow stat={round.stats.sandSave} />
                 <td>{calculatePoints(round)}</td>
               </tr>
             );
@@ -204,6 +209,12 @@ function PlayerAggregate({
       </StatsTable>
     </div>
   );
+}
+interface ValueRowProps {
+  readonly stat: PlayerAggregateRoundStat;
+}
+function ValueRow({ stat: { value, holes } }: ValueRowProps): JSX.Element {
+  return <td title={holes.join(", ")}>{value}</td>;
 }
 
 /* interface PlayerTableProps {
