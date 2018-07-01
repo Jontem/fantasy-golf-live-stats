@@ -2,7 +2,8 @@ import { LeaderBoardPlayer } from "./leaderboard-json-types";
 import {
   PlayerScorecardResponse,
   PlayerScorecardRound,
-  PlayerScorecardShot
+  PlayerScorecardShot,
+  PlayerScorecardHole
 } from "./player-scorecard-types";
 
 export interface Hole {
@@ -64,16 +65,11 @@ function getPlayerAggregateRounds(
     const round = parseInt(r.n, 10);
     return {
       id: round,
-      shots: r.holes.reduce(
-        (soFar, current) => soFar + current.shots.length,
-        0
-      ),
+      shots: r.holes
+        .filter(h => h.sc.length > 0)
+        .reduce((soFar, current) => soFar + current.shots.length, 0),
       finnished: r.holes.every(h => h.sc.length > 0),
-      currentHole:
-        r.holes
-          .concat()
-          .reverse()
-          .findIndex(h => h.sc.length > 0) + 1,
+      currentHole: getCurrentHole(r.holes),
       stats: getRoundStats(holes, r)
     };
   });
@@ -213,14 +209,23 @@ function getSandSaves(shots: ReadonlyArray<PlayerScorecardShot>): number {
     return 0;
   }
 
-  console.log("toGreenBunkerShot", toGreenBunkerShot);
-  console.log("totalShots", shots.length);
   if (shots.length - parseInt(toGreenBunkerShot.n, 10) > 2) {
-    console.log("No sandy");
     return 0;
   }
 
-  // debugger;
-  console.log("sandy");
+  return 1;
+}
+
+function getCurrentHole(holes: ReadonlyArray<PlayerScorecardHole>): number {
+  const currentHole = holes
+    .concat()
+    .reverse()
+    .find(h => h.sc.length > 0);
+
+  if (currentHole) {
+    const holeNumber = parseInt(currentHole.cNum, 10);
+    return holeNumber === 18 ? 18 : holeNumber + 1;
+  }
+
   return 1;
 }

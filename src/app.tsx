@@ -96,11 +96,11 @@ export class App extends React.Component<Props, State> {
         </div>
       );
     }
-    const coursePar = holes.reduce((soFar, current) => soFar + current.par, 0);
+
     return (
       <div>
         <h1>Stats</h1>
-        <MyPlayers playerAggregates={playerAggregates} coursePar={coursePar} />
+        <MyPlayers playerAggregates={playerAggregates} holes={holes} />
         {/* <PlayerTable players={playerData.tournament.players} /> */}
       </div>
     );
@@ -121,14 +121,14 @@ const StatsTable = styled.table`
 
 interface MyPlayersProps {
   readonly playerAggregates: ReadonlyArray<PlayerAggregate>;
-  readonly coursePar: number;
+  readonly holes: ReadonlyArray<Hole>;
 }
 
-function MyPlayers({ coursePar, playerAggregates }: MyPlayersProps) {
+function MyPlayers({ holes, playerAggregates }: MyPlayersProps) {
   return (
     <div>
       {playerAggregates.map(p => (
-        <PlayerAggregate key={p.id} playerAggregate={p} coursePar={coursePar} />
+        <PlayerAggregate key={p.id} playerAggregate={p} holes={holes} />
       ))}
     </div>
   );
@@ -136,11 +136,11 @@ function MyPlayers({ coursePar, playerAggregates }: MyPlayersProps) {
 
 interface PlayerAggregateProps {
   readonly playerAggregate: PlayerAggregate;
-  readonly coursePar: number;
+  readonly holes: ReadonlyArray<Hole>;
 }
 
 function PlayerAggregate({
-  coursePar,
+  holes,
   playerAggregate: { playerName, rounds }
 }: PlayerAggregateProps): JSX.Element {
   return (
@@ -172,7 +172,14 @@ function PlayerAggregate({
               <tr key={round.id}>
                 <td>Round {round.id}</td>
                 <td>{round.finnished ? round.shots : round.currentHole}</td>
-                <td>{round.shots - coursePar}</td>
+                <td>
+                  {getToPar(
+                    holes,
+                    round.shots,
+                    round.currentHole,
+                    round.finnished
+                  )}
+                </td>
                 <ValueRow stat={round.stats.hio} />
                 <ValueRow stat={round.stats.doubleEagle} />
                 <ValueRow stat={round.stats.eagle} />
@@ -289,4 +296,22 @@ interface ValueRowProps {
 }
 function ValueRow({ stat: { value, holes } }: ValueRowProps): JSX.Element {
   return <td title={holes.join(", ")}>{value}</td>;
+}
+
+function getToPar(
+  holes: ReadonlyArray<Hole>,
+  shots: number,
+  currentHole: number,
+  finnished: boolean
+): number {
+  if (finnished) {
+    const coursePar = holes.reduce((soFar, current) => soFar + current.par, 0);
+    return shots - coursePar;
+  }
+  const lastCompletedHole = currentHole - 1;
+  const currentPar = holes
+    .slice(0, lastCompletedHole)
+    .reduce((soFar, current) => soFar + current.par, 0);
+
+  return shots - currentPar;
 }
