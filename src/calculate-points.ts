@@ -17,7 +17,8 @@ export const perfomanceMultiplier = Object.freeze({
   threePutt: -3,
   missedGir: -1,
   sandSave: 2,
-  bunker: -1
+  bunker: -1,
+  fairwayHits: 1
 });
 
 export function calculatePoints(round: PlayerAggregateRound): number {
@@ -74,6 +75,9 @@ function getPoints(
     }
     case "bunker": {
       return stats[key].value * perfomanceMultiplier.bunker;
+    }
+    case "fairwayHits": {
+      return stats[key].value * perfomanceMultiplier.fairwayHits;
     }
     default: {
       exhaustiveCheck(key);

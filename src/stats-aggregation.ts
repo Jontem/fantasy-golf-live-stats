@@ -28,6 +28,7 @@ export interface PlayerAggregateRoundStats {
   readonly threePutt: PlayerAggregateRoundStat;
   readonly bunker: PlayerAggregateRoundStat;
   readonly sandSave: PlayerAggregateRoundStat;
+  readonly fairwayHits: PlayerAggregateRoundStat;
 }
 
 export interface PlayerAggregateRound {
@@ -144,6 +145,10 @@ function calculateAggregateStatsForHole(
     sandSave: createPlayerAggregateRoundStat(
       getSandSaves(countableShots),
       hole.id
+    ),
+    fairwayHits: createPlayerAggregateRoundStat(
+      isFairwayHit(hole, countableShots),
+      hole.id
     )
   };
 }
@@ -202,12 +207,27 @@ function getEmptyAggregateStats(): PlayerAggregateRoundStats {
     outOfBounds: { value: 0, holes: [] },
     threePutt: { value: 0, holes: [] },
     bunker: { value: 0, holes: [] },
-    sandSave: { value: 0, holes: [] }
+    sandSave: { value: 0, holes: [] },
+    fairwayHits: { value: 0, holes: [] }
   };
 }
 
-function getSandSaves(shots: ReadonlyArray<PlayerScorecardShot>): number {
-  const toGreenBunkerShot = shots
+const fairwayRegex = /^E.F$/;
+function isFairwayHit(
+  hole: Hole,
+  countableShots: ReadonlyArray<PlayerScorecardShot>
+): number {
+  if (hole.par < 4) {
+    return 0;
+  }
+
+  return fairwayRegex.test(countableShots[0].to) ? 1 : 0;
+}
+
+function getSandSaves(
+  countableShots: ReadonlyArray<PlayerScorecardShot>
+): number {
+  const toGreenBunkerShot = countableShots
     .concat()
     .reverse()
     .find(s => s.to.startsWith("EG"));
@@ -216,7 +236,7 @@ function getSandSaves(shots: ReadonlyArray<PlayerScorecardShot>): number {
     return 0;
   }
 
-  if (shots.length - parseInt(toGreenBunkerShot.n, 10) > 2) {
+  if (countableShots.length - parseInt(toGreenBunkerShot.n, 10) > 2) {
     return 0;
   }
 

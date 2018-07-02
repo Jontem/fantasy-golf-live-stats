@@ -165,6 +165,7 @@ function PlayerAggregate({
           <th>Three putt</th>
           <th>Bunker</th>
           <th>Sand save</th>
+          <th>Fairway hit</th>
           <th>Points</th>
         </thead>
         <tbody>
@@ -194,6 +195,7 @@ function PlayerAggregate({
                 <ValueRow stats={round.stats} statKey="threePutt" />
                 <ValueRow stats={round.stats} statKey="bunker" />
                 <ValueRow stats={round.stats} statKey="sandSave" />
+                <ValueRow stats={round.stats} statKey="fairwayHits" />
                 <td>{calculatePoints(round)}</td>
               </tr>
             );
@@ -289,6 +291,12 @@ function PlayerAggregate({
             <td>
               {rounds.reduce(
                 (soFar, current) => soFar + current.stats.sandSave.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.fairwayHits.value,
                 0
               )}
             </td>
