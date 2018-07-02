@@ -21,7 +21,9 @@ export const perfomanceMultiplier = Object.freeze({
   fairwayHits: 1,
   missedPutt5Feet: -2,
   putt15To25Feet: 3,
-  putt25Feet: 6
+  putt25Feet: 6,
+  under70: 4,
+  under65: 10
 });
 
 export function calculatePoints(round: PlayerAggregateRound): number {
@@ -29,10 +31,29 @@ export function calculatePoints(round: PlayerAggregateRound): number {
     round.stats
   ) as any;
 
-  return keys.reduce(
-    (soFar, current) => soFar + getPoints(round.stats, current),
-    0
+  const roundStatsPoints = getShotPoints(round);
+
+  return (
+    roundStatsPoints +
+    keys.reduce((soFar, current) => soFar + getPoints(round.stats, current), 0)
   );
+}
+
+export function getShotPoints(round: PlayerAggregateRound): number {
+  let points = 0;
+
+  if (!round.finnished) {
+    return 0;
+  }
+
+  if (round.shots < 65) {
+    points += perfomanceMultiplier.under65;
+  }
+
+  if (round.shots >= 65 && round.shots < 70) {
+    points += perfomanceMultiplier.under70;
+  }
+  return points;
 }
 
 function getPoints(

@@ -9,7 +9,11 @@ import {
   Hole,
   PlayerAggregateRoundStats
 } from "./stats-aggregation";
-import { calculatePoints, perfomanceMultiplier } from "./calculate-points";
+import {
+  calculatePoints,
+  perfomanceMultiplier,
+  getShotPoints
+} from "./calculate-points";
 
 const leaderboardUrl =
   "https://statdata.pgatour.com/r/471/2018/leaderboard-v2.json";
@@ -135,6 +139,10 @@ function MyPlayers({ holes, playerAggregates }: MyPlayersProps) {
   );
 }
 
+const Points = styled.span`
+  font-size: 14px;
+`;
+
 interface PlayerAggregateProps {
   readonly playerAggregate: PlayerAggregate;
   readonly holes: ReadonlyArray<Hole>;
@@ -183,8 +191,10 @@ function PlayerAggregate({
                     round.shots,
                     round.currentHole,
                     round.finnished
-                  )}
+                  )}{" "}
+                  <Points>({getShotPoints(round)})</Points>
                 </td>
+                <ValueRow stats={round.stats} statKey="hio" />
                 <ValueRow stats={round.stats} statKey="hio" />
                 <ValueRow stats={round.stats} statKey="doubleEagle" />
                 <ValueRow stats={round.stats} statKey="eagle" />
@@ -337,9 +347,6 @@ function PlayerAggregate({
   );
 }
 
-const Points = styled.span`
-  font-size: 14px;
-`;
 interface ValueRowProps {
   readonly stats: PlayerAggregateRoundStats;
   readonly statKey: keyof PlayerAggregateRoundStats;
