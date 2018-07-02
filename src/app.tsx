@@ -166,6 +166,9 @@ function PlayerAggregate({
           <th>Bunker</th>
           <th>Sand save</th>
           <th>Fairway hit</th>
+          <th>Missed putt {"<"} 5 feet</th>
+          <th>Putt 15-25 feet</th>
+          <th>Putt > 25 feet</th>
           <th>Points</th>
         </thead>
         <tbody>
@@ -196,6 +199,9 @@ function PlayerAggregate({
                 <ValueRow stats={round.stats} statKey="bunker" />
                 <ValueRow stats={round.stats} statKey="sandSave" />
                 <ValueRow stats={round.stats} statKey="fairwayHits" />
+                <ValueRow stats={round.stats} statKey="missedPutt5Feet" />
+                <ValueRow stats={round.stats} statKey="putt15To25Feet" />
+                <ValueRow stats={round.stats} statKey="putt25Feet" />
                 <td>{calculatePoints(round)}</td>
               </tr>
             );
@@ -302,6 +308,24 @@ function PlayerAggregate({
             </td>
             <td>
               {rounds.reduce(
+                (soFar, current) => soFar + current.stats.missedPutt5Feet.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.putt15To25Feet.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
+                (soFar, current) => soFar + current.stats.putt25Feet.value,
+                0
+              )}
+            </td>
+            <td>
+              {rounds.reduce(
                 (soFar, current) => soFar + calculatePoints(current),
                 0
               )}
@@ -312,6 +336,10 @@ function PlayerAggregate({
     </div>
   );
 }
+
+const Points = styled.span`
+  font-size: 14px;
+`;
 interface ValueRowProps {
   readonly stats: PlayerAggregateRoundStats;
   readonly statKey: keyof PlayerAggregateRoundStats;
@@ -320,7 +348,13 @@ function ValueRow({ statKey, stats }: ValueRowProps): JSX.Element {
   const { holes, value } = stats[statKey];
   return (
     <td title={holes.join(", ")}>
-      {value}({value * perfomanceMultiplier[statKey]})
+      {value}
+      <Points>
+        {" "}
+        (
+        {value * perfomanceMultiplier[statKey]}
+        )
+      </Points>
     </td>
   );
 }

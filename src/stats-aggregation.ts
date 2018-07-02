@@ -29,6 +29,9 @@ export interface PlayerAggregateRoundStats {
   readonly bunker: PlayerAggregateRoundStat;
   readonly sandSave: PlayerAggregateRoundStat;
   readonly fairwayHits: PlayerAggregateRoundStat;
+  readonly missedPutt5Feet: PlayerAggregateRoundStat;
+  readonly putt15To25Feet: PlayerAggregateRoundStat;
+  readonly putt25Feet: PlayerAggregateRoundStat;
 }
 
 export interface PlayerAggregateRound {
@@ -149,6 +152,18 @@ function calculateAggregateStatsForHole(
     fairwayHits: createPlayerAggregateRoundStat(
       isFairwayHit(hole, countableShots),
       hole.id
+    ),
+    missedPutt5Feet: createPlayerAggregateRoundStat(
+      missedPut5Feet(countableShots),
+      hole.id
+    ),
+    putt15To25Feet: createPlayerAggregateRoundStat(
+      putt15To25Feet(countableShots),
+      hole.id
+    ),
+    putt25Feet: createPlayerAggregateRoundStat(
+      putt25Feet(countableShots),
+      hole.id
     )
   };
 }
@@ -208,7 +223,10 @@ function getEmptyAggregateStats(): PlayerAggregateRoundStats {
     threePutt: { value: 0, holes: [] },
     bunker: { value: 0, holes: [] },
     sandSave: { value: 0, holes: [] },
-    fairwayHits: { value: 0, holes: [] }
+    fairwayHits: { value: 0, holes: [] },
+    missedPutt5Feet: { value: 0, holes: [] },
+    putt15To25Feet: { value: 0, holes: [] },
+    putt25Feet: { value: 0, holes: [] }
   };
 }
 
@@ -222,6 +240,51 @@ function isFairwayHit(
   }
 
   return fairwayRegex.test(countableShots[0].to) ? 1 : 0;
+}
+
+function missedPut5Feet(
+  countableShots: ReadonlyArray<PlayerScorecardShot>
+): number {
+  const lastShot = countableShots[countableShots.length - 1];
+
+  const lastWasPutt = lastShot && lastShot.putt.length > 0;
+  if (!lastWasPutt) {
+    return 0;
+  }
+  // inches
+  return countableShots.filter(s => s.putt.length > 0).some(s => {
+    const puttDistance = parseInt(s.dist, 10);
+    return inchesToFeet(puttDistance) < 5 && s.cup !== "y";
+  })
+    ? 1
+    : 0;
+}
+
+function putt15To25Feet(
+  countableShots: ReadonlyArray<PlayerScorecardShot>
+): number {
+  const lastShot = countableShots[countableShots.length - 1];
+  const lastWasPutt = lastShot.putt.length > 0;
+  if (!lastWasPutt) {
+    return 0;
+  }
+  // inches
+  const puttDistance = parseInt(lastShot.dist, 10);
+  const puttDistanceFeet = inchesToFeet(puttDistance);
+  return puttDistanceFeet >= 15 && puttDistanceFeet <= 25 ? 1 : 0;
+}
+function putt25Feet(
+  countableShots: ReadonlyArray<PlayerScorecardShot>
+): number {
+  const lastShot = countableShots[countableShots.length - 1];
+  const lastWasPutt = lastShot.putt.length > 0;
+  if (!lastWasPutt) {
+    return 0;
+  }
+  // inches
+  const puttDistance = parseInt(lastShot.dist, 10);
+  const puttDistanceFeet = inchesToFeet(puttDistance);
+  return puttDistanceFeet > 25 ? 1 : 0;
 }
 
 function getSandSaves(
@@ -261,4 +324,8 @@ function getCountableShots(
   shots: ReadonlyArray<PlayerScorecardShot>
 ): ReadonlyArray<PlayerScorecardShot> {
   return shots.filter(s => s.t !== "D");
+}
+
+function inchesToFeet(inches: number): number {
+  return inches / 12;
 }

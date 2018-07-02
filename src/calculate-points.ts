@@ -18,7 +18,10 @@ export const perfomanceMultiplier = Object.freeze({
   missedGir: -1,
   sandSave: 2,
   bunker: -1,
-  fairwayHits: 1
+  fairwayHits: 1,
+  missedPutt5Feet: -2,
+  putt15To25Feet: 3,
+  putt25Feet: 6
 });
 
 export function calculatePoints(round: PlayerAggregateRound): number {
@@ -78,6 +81,15 @@ function getPoints(
     }
     case "fairwayHits": {
       return stats[key].value * perfomanceMultiplier.fairwayHits;
+    }
+    case "missedPutt5Feet": {
+      return stats[key].value * perfomanceMultiplier.missedPutt5Feet;
+    }
+    case "putt15To25Feet": {
+      return stats[key].value * perfomanceMultiplier.putt15To25Feet;
+    }
+    case "putt25Feet": {
+      return stats[key].value * perfomanceMultiplier.putt25Feet;
     }
     default: {
       exhaustiveCheck(key);
