@@ -4,6 +4,22 @@ import {
   PlayerAggregateRoundStats
 } from "./stats-aggregation";
 
+export const perfomanceMultiplier = Object.freeze({
+  hio: 25,
+  doubleEagle: 15,
+  eagle: 7,
+  birdie: 3,
+  par: 1,
+  bogey: -1,
+  doubleBogey: -4,
+  ballInWater: -7,
+  outOfBounds: -10,
+  threePutt: -3,
+  missedGir: -1,
+  sandSave: 2,
+  bunker: -1
+});
+
 export function calculatePoints(round: PlayerAggregateRound): number {
   const keys: ReadonlyArray<keyof PlayerAggregateRoundStats> = Object.keys(
     round.stats
@@ -21,43 +37,43 @@ function getPoints(
 ): number {
   switch (key) {
     case "hio": {
-      return stats[key].value * 25;
+      return stats[key].value * perfomanceMultiplier.hio;
     }
     case "doubleEagle": {
-      return stats[key].value * 15;
+      return stats[key].value * perfomanceMultiplier.doubleEagle;
     }
     case "eagle": {
-      return stats[key].value * 7;
+      return stats[key].value * perfomanceMultiplier.eagle;
     }
     case "birdie": {
-      return stats[key].value * 3;
+      return stats[key].value * perfomanceMultiplier.birdie;
     }
     case "par": {
-      return stats[key].value * 1;
+      return stats[key].value * perfomanceMultiplier.par;
     }
     case "bogey": {
-      return stats[key].value * -1;
+      return stats[key].value * perfomanceMultiplier.bogey;
     }
     case "doubleBogey": {
-      return stats[key].value * -4;
+      return stats[key].value * perfomanceMultiplier.doubleBogey;
     }
     case "ballInWater": {
-      return stats[key].value * -7;
+      return stats[key].value * perfomanceMultiplier.ballInWater;
     }
     case "outOfBounds": {
-      return stats[key].value * -10;
+      return stats[key].value * perfomanceMultiplier.outOfBounds;
     }
     case "threePutt": {
-      return stats[key].value * -3;
+      return stats[key].value * perfomanceMultiplier.threePutt;
     }
     case "missedGir": {
-      return stats[key].value * -1;
+      return stats[key].value * perfomanceMultiplier.missedGir;
     }
     case "sandSave": {
-      return stats[key].value * 2;
+      return stats[key].value * perfomanceMultiplier.sandSave;
     }
     case "bunker": {
-      return stats[key].value * -1;
+      return stats[key].value * perfomanceMultiplier.bunker;
     }
     default: {
       exhaustiveCheck(key);

@@ -6,9 +6,10 @@ import {
   getPlayerAggregates,
   PlayerAggregate,
   PlayerAggregateRoundStat,
-  Hole
+  Hole,
+  PlayerAggregateRoundStats
 } from "./stats-aggregation";
-import { calculatePoints } from "./calculate-points";
+import { calculatePoints, perfomanceMultiplier } from "./calculate-points";
 
 const leaderboardUrl =
   "https://statdata.pgatour.com/r/471/2018/leaderboard-v2.json";
@@ -180,19 +181,19 @@ function PlayerAggregate({
                     round.finnished
                   )}
                 </td>
-                <ValueRow stat={round.stats.hio} />
-                <ValueRow stat={round.stats.doubleEagle} />
-                <ValueRow stat={round.stats.eagle} />
-                <ValueRow stat={round.stats.birdie} />
-                <ValueRow stat={round.stats.par} />
-                <ValueRow stat={round.stats.bogey} />
-                <ValueRow stat={round.stats.doubleBogey} />
-                <ValueRow stat={round.stats.ballInWater} />
-                <ValueRow stat={round.stats.outOfBounds} />
-                <ValueRow stat={round.stats.missedGir} />
-                <ValueRow stat={round.stats.threePutt} />
-                <ValueRow stat={round.stats.bunker} />
-                <ValueRow stat={round.stats.sandSave} />
+                <ValueRow stats={round.stats} statKey="hio" />
+                <ValueRow stats={round.stats} statKey="doubleEagle" />
+                <ValueRow stats={round.stats} statKey="eagle" />
+                <ValueRow stats={round.stats} statKey="birdie" />
+                <ValueRow stats={round.stats} statKey="par" />
+                <ValueRow stats={round.stats} statKey="bogey" />
+                <ValueRow stats={round.stats} statKey="doubleBogey" />
+                <ValueRow stats={round.stats} statKey="ballInWater" />
+                <ValueRow stats={round.stats} statKey="outOfBounds" />
+                <ValueRow stats={round.stats} statKey="missedGir" />
+                <ValueRow stats={round.stats} statKey="threePutt" />
+                <ValueRow stats={round.stats} statKey="bunker" />
+                <ValueRow stats={round.stats} statKey="sandSave" />
                 <td>{calculatePoints(round)}</td>
               </tr>
             );
@@ -304,10 +305,16 @@ function PlayerAggregate({
   );
 }
 interface ValueRowProps {
-  readonly stat: PlayerAggregateRoundStat;
+  readonly stats: PlayerAggregateRoundStats;
+  readonly statKey: keyof PlayerAggregateRoundStats;
 }
-function ValueRow({ stat: { value, holes } }: ValueRowProps): JSX.Element {
-  return <td title={holes.join(", ")}>{value}</td>;
+function ValueRow({ statKey, stats }: ValueRowProps): JSX.Element {
+  const { holes, value } = stats[statKey];
+  return (
+    <td title={holes.join(", ")}>
+      {value}({value * perfomanceMultiplier[statKey]})
+    </td>
+  );
 }
 
 function getToPar(
