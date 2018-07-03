@@ -134,7 +134,7 @@ function calculateAggregateStatsForHole(
       hole.id
     ),
     missedGir: createPlayerAggregateRoundStat(
-      countableShots.findIndex(s => s.to === "OGR") + 1 > par - 2 ? 1 : 0,
+      isGreenMiss(par, countableShots),
       hole.id
     ),
     threePutt: createPlayerAggregateRoundStat(
@@ -228,6 +228,18 @@ function getEmptyAggregateStats(): PlayerAggregateRoundStats {
     putt15To25Feet: { value: 0, holes: [] },
     putt25Feet: { value: 0, holes: [] }
   };
+}
+
+function isGreenMiss(
+  holePar: number,
+  countableShots: ReadonlyArray<PlayerScorecardShot>
+): number {
+  const firstShotOnGreen = countableShots.find(s => s.to === "OGR");
+  if (firstShotOnGreen === undefined) {
+    return 1;
+  }
+  const strokeCount = parseInt(firstShotOnGreen.n, 10);
+  return strokeCount > holePar - 2 ? 1 : 0;
 }
 
 const fairwayRegex = /^E.F$/;
