@@ -195,7 +195,6 @@ function PlayerAggregate({
                   <Points>({getShotPoints(round)})</Points>
                 </td>
                 <ValueRow stats={round.stats} statKey="hio" />
-                <ValueRow stats={round.stats} statKey="hio" />
                 <ValueRow stats={round.stats} statKey="doubleEagle" />
                 <ValueRow stats={round.stats} statKey="eagle" />
                 <ValueRow stats={round.stats} statKey="birdie" />
