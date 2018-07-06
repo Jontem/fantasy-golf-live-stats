@@ -1,4 +1,4 @@
-import { LeaderBoardPlayer } from "./leaderboard-json-types";
+import { LeaderboardPlayer } from "./leaderboard-json-types";
 import {
   PlayerScorecardResponse,
   PlayerScorecardRound,
@@ -42,21 +42,14 @@ export interface PlayerAggregateRound {
   readonly stats: PlayerAggregateRoundStats;
 }
 export interface PlayerAggregate {
-  readonly id: string;
-  readonly playerName: string;
   readonly rounds: ReadonlyArray<PlayerAggregateRound>;
 }
 
 export function getPlayerAggregates(
   holes: ReadonlyArray<Hole>,
-  leaderBoardPlayer: LeaderBoardPlayer,
   playerScorecard: PlayerScorecardResponse
 ): PlayerAggregate {
   return {
-    id: leaderBoardPlayer.player_id,
-    playerName: `${leaderBoardPlayer.player_bio.first_name} ${
-      leaderBoardPlayer.player_bio.last_name
-    }`,
     rounds: getPlayerAggregateRounds(holes, playerScorecard)
   };
 }

@@ -4,7 +4,7 @@ export interface LeaderBoardResponse {
 
 export interface LeaderBoard {
   readonly courses: ReadonlyArray<Course>;
-  readonly players: ReadonlyArray<LeaderBoardPlayer>;
+  readonly players: ReadonlyArray<LeaderboardPlayer>;
   readonly start_date: string;
   readonly end_date: string;
   readonly is_started: boolean;
@@ -25,7 +25,7 @@ export interface Round {
   readonly par: number;
 }
 
-export interface LeaderBoardPlayer {
+export interface LeaderboardPlayer {
   readonly player_id: string;
   readonly player_bio: LeaderBoardPlayerBio;
 }

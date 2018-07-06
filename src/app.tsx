@@ -1,11 +1,6 @@
 import * as React from "react";
-import { PlayerScorecardResponse } from "./player-scorecard-types";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
-import {
-  getPlayerAggregates,
-  PlayerAggregate,
-  Hole
-} from "./stats-aggregation";
+import { Hole } from "./stats-aggregation";
 import { PlayerInfo } from "./player-info";
 
 const leaderboardUrl =
@@ -76,13 +71,18 @@ export class App extends React.Component<Props, State> {
       <div>
         <h1>Stats</h1>
         <div>
-          {players.map(p => (
-            <PlayerInfo
-              playerId={p}
-              holes={holes}
-              leaderBoardResponse={leaderboard}
-            />
-          ))}
+          {players.map(playerId => {
+            const leaderboardPlayer = leaderboard.leaderboard.players.find(
+              p => p.player_id === playerId
+            )!;
+            return (
+              <PlayerInfo
+                playerId={leaderboardPlayer.player_id}
+                holes={holes}
+                leaderboardPlayer={leaderboardPlayer}
+              />
+            );
+          })}
         </div>
       </div>
     );

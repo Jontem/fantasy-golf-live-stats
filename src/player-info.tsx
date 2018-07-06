@@ -7,12 +7,12 @@ import {
 import { getShotPoints, calculatePoints } from "./calculate-points";
 import { StatsTable, Points } from "./elements";
 import { ValueRow } from "./value-row";
-import { LeaderBoardResponse } from "./leaderboard-json-types";
+import { LeaderboardPlayer } from "./leaderboard-json-types";
 
 interface PlayerAggregateProps {
   readonly holes: ReadonlyArray<Hole>;
   readonly playerId: string;
-  readonly leaderBoardResponse: LeaderBoardResponse;
+  readonly leaderboardPlayer: LeaderboardPlayer;
 }
 interface State {
   readonly expanded: boolean;
@@ -36,23 +36,15 @@ export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
       res => res.json()
     );
 
-    const playerId = r.p.id;
-    const leaderboardPlayer = this.props.leaderBoardResponse.leaderboard.players.find(
-      p => p.player_id === playerId
-    )!;
     console.log(r);
-    const playerAggregate = getPlayerAggregates(
-      this.props.holes,
-      leaderboardPlayer,
-      r
-    );
+    const playerAggregate = getPlayerAggregates(this.props.holes, r);
     this.setState(state => ({
       playerAggregate
     }));
   }
 
   render(): JSX.Element {
-    const { holes } = this.props;
+    const { holes, leaderboardPlayer } = this.props;
     const { playerAggregate } = this.state;
 
     if (playerAggregate === undefined) {
@@ -63,7 +55,11 @@ export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
       );
     }
 
-    const { playerName, rounds } = playerAggregate;
+    const { rounds } = playerAggregate;
+
+    const playerName = `${leaderboardPlayer.player_bio.first_name} ${
+      leaderboardPlayer.player_bio.last_name
+    }`;
 
     const setState = this.setState.bind(this);
     return (
