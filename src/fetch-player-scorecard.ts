@@ -22,9 +22,11 @@ export async function fetchPlayerScorecard(
     localStorage.getItem(localStorageKey) || "{}"
   );
   const fetchPlayerDataCache = responseStore[playerScorecardUrl];
+
+  // cache 60 seconds
   if (
     fetchPlayerDataCache &&
-    Math.round((Date.now() - fetchPlayerDataCache.date) / 1000) < 30
+    Math.round((Date.now() - fetchPlayerDataCache.date) / 1000) < 60
   ) {
     return fetchPlayerDataCache;
   }
