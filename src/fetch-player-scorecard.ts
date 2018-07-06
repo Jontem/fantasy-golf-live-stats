@@ -17,10 +17,11 @@ interface ResponseStore {
 export async function fetchPlayerScorecard(
   playerId: string
 ): Promise<FetchPlayerData> {
+  const playerScorecardUrl = getPlayerScorecardUrl(playerId);
   const responseStore: ResponseStore = JSON.parse(
     localStorage.getItem(localStorageKey) || "{}"
   );
-  const fetchPlayerDataCache = responseStore[playerId];
+  const fetchPlayerDataCache = responseStore[playerScorecardUrl];
   if (
     fetchPlayerDataCache &&
     Math.round((Date.now() - fetchPlayerDataCache.date) / 1000) < 30
@@ -28,9 +29,7 @@ export async function fetchPlayerScorecard(
     return fetchPlayerDataCache;
   }
 
-  const r = await fetch(getPlayerScorecardUrl(playerId)).then(res =>
-    res.json()
-  );
+  const r = await fetch(playerScorecardUrl).then(res => res.json());
 
   const fetchPlayerData: FetchPlayerData = {
     response: r,
@@ -39,7 +38,7 @@ export async function fetchPlayerScorecard(
 
   localStorage.setItem(
     localStorageKey,
-    JSON.stringify({ ...responseStore, [playerId]: fetchPlayerData })
+    JSON.stringify({ ...responseStore, [playerScorecardUrl]: fetchPlayerData })
   );
 
   return fetchPlayerData;
