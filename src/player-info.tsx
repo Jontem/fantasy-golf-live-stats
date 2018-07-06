@@ -105,6 +105,7 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
               <th>Missed putt {"<"} 5 feet</th>
               <th>Putt 15-25 feet</th>
               <th>Putt > 25 feet</th>
+              <th>Birdie-Birdie</th>
               <th>Points</th>
             </thead>
             <tbody>
@@ -139,6 +140,7 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
                     <ValueRow stats={round.stats} statKey="missedPutt5Feet" />
                     <ValueRow stats={round.stats} statKey="putt15To25Feet" />
                     <ValueRow stats={round.stats} statKey="putt25Feet" />
+                    <ValueRow stats={round.stats} statKey="consecutiveBirdie" />
                     <td>{calculatePoints(round)}</td>
                   </tr>
                 );
@@ -260,6 +262,13 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
                 <td>
                   {rounds.reduce(
                     (soFar, current) => soFar + current.stats.putt25Feet.value,
+                    0
+                  )}
+                </td>
+                <td>
+                  {rounds.reduce(
+                    (soFar, current) =>
+                      soFar + current.stats.consecutiveBirdie.value,
                     0
                   )}
                 </td>

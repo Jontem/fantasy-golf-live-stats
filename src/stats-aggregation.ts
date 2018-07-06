@@ -32,6 +32,7 @@ export interface PlayerAggregateRoundStats {
   readonly missedPutt5Feet: PlayerAggregateRoundStat;
   readonly putt15To25Feet: PlayerAggregateRoundStat;
   readonly putt25Feet: PlayerAggregateRoundStat;
+  readonly consecutiveBirdie: PlayerAggregateRoundStat;
 }
 
 export interface PlayerAggregateRound {
@@ -79,23 +80,35 @@ function getRoundStats(
   holes: ReadonlyArray<Hole>,
   playerScorecardRound: PlayerScorecardRound
 ): PlayerAggregateRoundStats {
-  return playerScorecardRound.holes.reduce((soFar, scorecardHole) => {
-    const holeId = parseInt(scorecardHole.cNum, 10);
-    const holeInfo = holes[holeId - 1];
+  return playerScorecardRound.holes
+    .reduce(
+      (soFar, scorecardHole) => {
+        const holeId = parseInt(scorecardHole.cNum, 10);
+        const holeInfo = holes[holeId - 1];
 
-    // Check if player have yet finnished hole
-    if (scorecardHole.sc.length === 0) {
-      return soFar;
-    }
+        // Check if player have yet finnished hole
+        if (scorecardHole.sc.length === 0) {
+          return soFar;
+        }
 
-    return mergeAggregateStats(
-      soFar,
-      calculateAggregateStatsForHole(holeInfo, scorecardHole.shots)
+        return soFar.concat(
+          calculateAggregateStatsForHole(
+            soFar[soFar.length - 1] || getEmptyAggregateStats(),
+            holeInfo,
+            scorecardHole.shots
+          )
+        );
+      },
+      [] as ReadonlyArray<PlayerAggregateRoundStats>
+    )
+    .reduce(
+      (soFar, current) => mergeAggregateStats(soFar, current),
+      getEmptyAggregateStats()
     );
-  }, getEmptyAggregateStats());
 }
 
 function calculateAggregateStatsForHole(
+  previous: PlayerAggregateRoundStats,
   hole: Hole,
   shots: ReadonlyArray<PlayerScorecardShot>
 ): PlayerAggregateRoundStats {
@@ -156,6 +169,15 @@ function calculateAggregateStatsForHole(
     ),
     putt25Feet: createPlayerAggregateRoundStat(
       putt25Feet(countableShots),
+      hole.id
+    ),
+    consecutiveBirdie: createPlayerAggregateRoundStat(
+      (previous.hio.value ||
+        previous.doubleEagle.value ||
+        previous.eagle.value ||
+        previous.birdie.value) === 1 && effective < 0
+        ? 1
+        : 0,
       hole.id
     )
   };
@@ -219,7 +241,8 @@ function getEmptyAggregateStats(): PlayerAggregateRoundStats {
     fairwayHits: { value: 0, holes: [] },
     missedPutt5Feet: { value: 0, holes: [] },
     putt15To25Feet: { value: 0, holes: [] },
-    putt25Feet: { value: 0, holes: [] }
+    putt25Feet: { value: 0, holes: [] },
+    consecutiveBirdie: { value: 0, holes: [] }
   };
 }
 

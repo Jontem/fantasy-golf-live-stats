@@ -23,7 +23,8 @@ export const perfomanceMultiplier = Object.freeze({
   putt15To25Feet: 3,
   putt25Feet: 6,
   under70: 4,
-  under65: 10
+  under65: 10,
+  consecutiveBirdie: 2
 });
 
 export function calculatePoints(round: PlayerAggregateRound): number {
@@ -110,6 +111,9 @@ function getPoints(
       return stats[key].value * perfomanceMultiplier.putt15To25Feet;
     }
     case "putt25Feet": {
+      return stats[key].value * perfomanceMultiplier.putt25Feet;
+    }
+    case "consecutiveBirdie": {
       return stats[key].value * perfomanceMultiplier.putt25Feet;
     }
     default: {
