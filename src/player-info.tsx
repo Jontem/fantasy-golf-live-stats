@@ -94,19 +94,19 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
               <th>-1</th>
               <th>Par</th>
               <th>+1</th>
-              <th>>= +2</th>
-              <th>Ball in water</th>
-              <th>Out of bounds</th>
+              <th>>=+2</th>
+              <th>Water</th>
+              <th>Out</th>
               <th>Missed GIR</th>
-              <th>Three putt</th>
+              <th>3 putt</th>
               <th>Bunker</th>
-              <th>Sand save</th>
+              <th>Sandy</th>
               <th>Fairway hit</th>
               <th>Missed putt {"<"} 5 feet</th>
               <th>Putt 15-25 feet</th>
               <th>Putt > 25 feet</th>
               <th>Birdie-Birdie</th>
-              <th>Points</th>
+              <th>P</th>
             </thead>
             <tbody>
               {rounds.map(round => {
