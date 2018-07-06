@@ -4,9 +4,11 @@ interface Props {
   readonly children: (childProps: State) => JSX.Element;
 }
 
+export type UpdatePlayers = (players: ReadonlyArray<string>) => void;
+
 interface State {
   readonly players: ReadonlyArray<string>;
-  readonly updatePlayers: (players: ReadonlyArray<string>) => void;
+  readonly updatePlayers: UpdatePlayers;
 }
 
 const localStorageKey = "savedPlayers";

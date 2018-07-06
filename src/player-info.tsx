@@ -5,15 +5,17 @@ import {
   getPlayerAggregates
 } from "./stats-aggregation";
 import { getShotPoints, calculatePoints } from "./calculate-points";
-import { StatsTable, Points } from "./elements";
+import { StatsTable, Points, PlayerHeader, DeletePlayer } from "./elements";
 import { ValueRow } from "./value-row";
 import { LeaderboardPlayer } from "./leaderboard-json-types";
 import { getPlayerName } from "./utilities";
+import { UpdatePlayers } from "./player-store";
 
-interface PlayerAggregateProps {
+interface PlayerInfoProps {
   readonly holes: ReadonlyArray<Hole>;
   readonly playerId: string;
   readonly leaderboardPlayer: LeaderboardPlayer;
+  readonly onPlayerDeleted: () => void;
 }
 interface State {
   readonly expanded: boolean;
@@ -23,8 +25,8 @@ interface State {
 const getPlayerScorecardUrl = (playerId: string) =>
   `https://statdata.pgatour.com/r/490/2018/scorecards/${playerId}.json`;
 
-export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
-  constructor(props: PlayerAggregateProps) {
+export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
+  constructor(props: PlayerInfoProps) {
     super(props);
     this.state = {
       expanded: false,
@@ -45,7 +47,7 @@ export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
   }
 
   render(): JSX.Element {
-    const { holes, leaderboardPlayer } = this.props;
+    const { holes, leaderboardPlayer, onPlayerDeleted } = this.props;
     const { playerAggregate } = this.state;
 
     const playerName = getPlayerName(leaderboardPlayer);
@@ -63,13 +65,23 @@ export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
     const setState = this.setState.bind(this);
     return (
       <div>
-        <h2
+        <PlayerHeader
           onClick={() => {
             setState((state: State) => ({
               expanded: !state.expanded
             }));
           }}
-        >{`${this.state.expanded ? "-" : "+"} ${playerName}`}</h2>
+        >{`${
+          this.state.expanded ? "-" : "+"
+        } ${playerName}`}</PlayerHeader>{" "}
+        <DeletePlayer
+          onClick={e => {
+            e.stopPropagation();
+            onPlayerDeleted();
+          }}
+        >
+          [X]
+        </DeletePlayer>
         {this.state.expanded && (
           <StatsTable>
             <thead>

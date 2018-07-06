@@ -1,10 +1,11 @@
 import * as React from "react";
 import { LeaderboardPlayer } from "./leaderboard-json-types";
 import { getPlayerName } from "./utilities";
+import { UpdatePlayers } from "./player-store";
 
 interface Props {
   readonly players: ReadonlyArray<LeaderboardPlayer>;
-  readonly updatePlayers: (players: ReadonlyArray<string>) => void;
+  readonly updatePlayers: UpdatePlayers;
   readonly addedPlayers: Set<string>;
 }
 interface State {

@@ -81,6 +81,11 @@ export class App extends React.Component<Props, State> {
                     playerId={leaderboardPlayer.player_id}
                     holes={holes}
                     leaderboardPlayer={leaderboardPlayer}
+                    onPlayerDeleted={() => {
+                      updatePlayers(
+                        players.filter(x => x !== leaderboardPlayer.player_id)
+                      );
+                    }}
                   />
                 );
               })}
