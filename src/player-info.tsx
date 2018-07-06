@@ -47,19 +47,19 @@ export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
     const { holes, leaderboardPlayer } = this.props;
     const { playerAggregate } = this.state;
 
+    const playerName = `${leaderboardPlayer.player_bio.first_name} ${
+      leaderboardPlayer.player_bio.last_name
+    }`;
+
     if (playerAggregate === undefined) {
       return (
         <div>
-          <h2>Loading</h2>
+          <h2>{playerName} - Loading</h2>
         </div>
       );
     }
 
     const { rounds } = playerAggregate;
-
-    const playerName = `${leaderboardPlayer.player_bio.first_name} ${
-      leaderboardPlayer.player_bio.last_name
-    }`;
 
     const setState = this.setState.bind(this);
     return (
