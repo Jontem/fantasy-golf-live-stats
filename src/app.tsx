@@ -1,14 +1,12 @@
 import * as React from "react";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { Hole } from "./stats-aggregation";
+import { PlayerStore } from "./player-store";
 import { PlayerInfo } from "./player-info";
 import { AddPlayer } from "./add-player";
 
 const leaderboardUrl =
   "https://statdata.pgatour.com/r/490/2018/leaderboard-v2.json";
-
-// const players = ["29461", "25198" /* "25632", "29420", "08793" */];
-const players = ["29221"];
 
 interface Props {}
 
@@ -69,27 +67,32 @@ export class App extends React.Component<Props, State> {
     }
 
     return (
-      <div>
-        <h1>Stats</h1>
-        <div>
-          {players.map(playerId => {
-            const leaderboardPlayer = leaderboard.leaderboard.players.find(
-              p => p.player_id === playerId
-            )!;
-            return (
-              <PlayerInfo
-                playerId={leaderboardPlayer.player_id}
-                holes={holes}
-                leaderboardPlayer={leaderboardPlayer}
-              />
-            );
-          })}
-        </div>
-        <AddPlayer
-          addedPlayers={new Set(players)}
-          players={leaderboard.leaderboard.players}
-        />
-      </div>
+      <PlayerStore>
+        {({ players, updatePlayers }) => (
+          <div>
+            <h1>Stats</h1>
+            <div>
+              {players.map(playerId => {
+                const leaderboardPlayer = leaderboard.leaderboard.players.find(
+                  p => p.player_id === playerId
+                )!;
+                return (
+                  <PlayerInfo
+                    playerId={leaderboardPlayer.player_id}
+                    holes={holes}
+                    leaderboardPlayer={leaderboardPlayer}
+                  />
+                );
+              })}
+            </div>
+            <AddPlayer
+              addedPlayers={new Set(players)}
+              players={leaderboard.leaderboard.players}
+              updatePlayers={updatePlayers}
+            />
+          </div>
+        )}
+      </PlayerStore>
     );
   }
 }

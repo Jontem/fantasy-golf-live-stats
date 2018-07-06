@@ -4,6 +4,7 @@ import { getPlayerName } from "./utilities";
 
 interface Props {
   readonly players: ReadonlyArray<LeaderboardPlayer>;
+  readonly updatePlayers: (players: ReadonlyArray<string>) => void;
   readonly addedPlayers: Set<string>;
 }
 interface State {
@@ -18,7 +19,7 @@ export class AddPlayer extends React.Component<Props, State> {
     };
   }
   render(): JSX.Element {
-    const { addedPlayers, players } = this.props;
+    const { addedPlayers, players, updatePlayers } = this.props;
     const validPlayers = players
       .filter(p => !addedPlayers.has(p.player_id))
       .map(p => ({
@@ -47,7 +48,7 @@ export class AddPlayer extends React.Component<Props, State> {
         </select>
         <button
           onClick={() => {
-            alert(selected);
+            updatePlayers(Array.from(addedPlayers.values()).concat(selected));
           }}
         >
           Add
