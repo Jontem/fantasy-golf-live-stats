@@ -9,7 +9,7 @@ import { StatsTable, Points, PlayerHeader, DeletePlayer } from "./elements";
 import { ValueRow } from "./value-row";
 import { LeaderboardPlayer } from "./leaderboard-json-types";
 import { getPlayerName } from "./utilities";
-import { UpdatePlayers } from "./player-store";
+import { fetchPlayerScorecard } from "./fetch-player-scorecard";
 
 interface PlayerInfoProps {
   readonly holes: ReadonlyArray<Hole>;
@@ -20,39 +20,36 @@ interface PlayerInfoProps {
 interface State {
   readonly expanded: boolean;
   readonly playerAggregate: PlayerAggregate | undefined;
+  readonly lastFetched: number | undefined;
 }
-
-const getPlayerScorecardUrl = (playerId: string) =>
-  `https://statdata.pgatour.com/r/490/2018/scorecards/${playerId}.json`;
 
 export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
   constructor(props: PlayerInfoProps) {
     super(props);
     this.state = {
       expanded: false,
-      playerAggregate: undefined
+      playerAggregate: undefined,
+      lastFetched: undefined
     };
   }
 
   async componentDidMount() {
-    const r = await fetch(getPlayerScorecardUrl(this.props.playerId)).then(
-      res => res.json()
-    );
-
-    console.log(r);
-    const playerAggregate = getPlayerAggregates(this.props.holes, r);
+    const { response, date } = await fetchPlayerScorecard(this.props.playerId);
+    console.log(response);
+    const playerAggregate = getPlayerAggregates(this.props.holes, response);
     this.setState(state => ({
-      playerAggregate
+      playerAggregate,
+      lastFetched: date
     }));
   }
 
   render(): JSX.Element {
     const { holes, leaderboardPlayer, onPlayerDeleted } = this.props;
-    const { playerAggregate } = this.state;
+    const { playerAggregate, lastFetched } = this.state;
 
     const playerName = getPlayerName(leaderboardPlayer);
 
-    if (playerAggregate === undefined) {
+    if (playerAggregate === undefined || lastFetched === undefined) {
       return (
         <div>
           <h2>{playerName} - Loading</h2>
@@ -63,6 +60,8 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
     const { rounds } = playerAggregate;
 
     const setState = this.setState.bind(this);
+
+    const fetchDate = new Date(lastFetched);
     return (
       <div>
         <PlayerHeader
@@ -83,204 +82,220 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
           [X]
         </DeletePlayer>
         {this.state.expanded && (
-          <StatsTable>
-            <thead>
-              <th />
-              <th>Hole / Par</th>
-              <th>To Par</th>
-              <th>Hio</th>
-              <th>-3</th>
-              <th>-2</th>
-              <th>-1</th>
-              <th>Par</th>
-              <th>+1</th>
-              <th>>=+2</th>
-              <th>Water</th>
-              <th>Out</th>
-              <th>Missed GIR</th>
-              <th>3 putt</th>
-              <th>Bunker</th>
-              <th>Sandy</th>
-              <th>Fairway hit</th>
-              <th>Missed putt {"<"} 5 feet</th>
-              <th>Putt 15-25 feet</th>
-              <th>Putt > 25 feet</th>
-              <th>Birdie-Birdie</th>
-              <th>P</th>
-            </thead>
-            <tbody>
-              {rounds.map(round => {
-                return (
-                  <tr key={round.id}>
-                    <td>Round {round.id}</td>
-                    <td>{round.finnished ? round.shots : round.currentHole}</td>
-                    <td>
-                      {getToPar(
-                        holes,
-                        round.shots,
-                        round.currentHole,
-                        round.finnished
-                      )}{" "}
-                      <Points>({getShotPoints(round)})</Points>
-                    </td>
-                    <ValueRow stats={round.stats} statKey="hio" />
-                    <ValueRow stats={round.stats} statKey="doubleEagle" />
-                    <ValueRow stats={round.stats} statKey="eagle" />
-                    <ValueRow stats={round.stats} statKey="birdie" />
-                    <ValueRow stats={round.stats} statKey="par" />
-                    <ValueRow stats={round.stats} statKey="bogey" />
-                    <ValueRow stats={round.stats} statKey="doubleBogey" />
-                    <ValueRow stats={round.stats} statKey="ballInWater" />
-                    <ValueRow stats={round.stats} statKey="outOfBounds" />
-                    <ValueRow stats={round.stats} statKey="missedGir" />
-                    <ValueRow stats={round.stats} statKey="threePutt" />
-                    <ValueRow stats={round.stats} statKey="bunker" />
-                    <ValueRow stats={round.stats} statKey="sandSave" />
-                    <ValueRow stats={round.stats} statKey="fairwayHits" />
-                    <ValueRow stats={round.stats} statKey="missedPutt5Feet" />
-                    <ValueRow stats={round.stats} statKey="putt15To25Feet" />
-                    <ValueRow stats={round.stats} statKey="putt25Feet" />
-                    <ValueRow stats={round.stats} statKey="consecutiveBirdie" />
-                    <td>{calculatePoints(round)}</td>
-                  </tr>
-                );
-              })}
-              <tr>
-                <td>Total</td>
-                <td />
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) =>
-                      soFar +
-                      getToPar(
-                        holes,
-                        current.shots,
-                        current.currentHole,
-                        current.finnished
-                      ),
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.hio.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.doubleEagle.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.eagle.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.birdie.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.par.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.bogey.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.doubleBogey.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.ballInWater.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.outOfBounds.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.missedGir.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.threePutt.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.bunker.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.sandSave.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.fairwayHits.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) =>
-                      soFar + current.stats.missedPutt5Feet.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) =>
-                      soFar + current.stats.putt15To25Feet.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + current.stats.putt25Feet.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) =>
-                      soFar + current.stats.consecutiveBirdie.value,
-                    0
-                  )}
-                </td>
-                <td>
-                  {rounds.reduce(
-                    (soFar, current) => soFar + calculatePoints(current),
-                    0
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </StatsTable>
+          <>
+            <p>{`${fetchDate.toLocaleDateString(
+              "sv-SE"
+            )} - ${fetchDate.toLocaleTimeString()}`}</p>
+            <StatsTable>
+              <thead>
+                <th />
+                <th>Hole / Par</th>
+                <th>To Par</th>
+                <th>Hio</th>
+                <th>-3</th>
+                <th>-2</th>
+                <th>-1</th>
+                <th>Par</th>
+                <th>+1</th>
+                <th>>=+2</th>
+                <th>Water</th>
+                <th>Out</th>
+                <th>Missed GIR</th>
+                <th>3 putt</th>
+                <th>Bunker</th>
+                <th>Sandy</th>
+                <th>Fairway hit</th>
+                <th>Missed putt {"<"} 5 feet</th>
+                <th>Putt 15-25 feet</th>
+                <th>Putt > 25 feet</th>
+                <th>Birdie-Birdie</th>
+                <th>P</th>
+              </thead>
+              <tbody>
+                {rounds.map(round => {
+                  return (
+                    <tr key={round.id}>
+                      <td>Round {round.id}</td>
+                      <td>
+                        {round.finnished ? round.shots : round.currentHole}
+                      </td>
+                      <td>
+                        {getToPar(
+                          holes,
+                          round.shots,
+                          round.currentHole,
+                          round.finnished
+                        )}{" "}
+                        <Points>({getShotPoints(round)})</Points>
+                      </td>
+                      <ValueRow stats={round.stats} statKey="hio" />
+                      <ValueRow stats={round.stats} statKey="doubleEagle" />
+                      <ValueRow stats={round.stats} statKey="eagle" />
+                      <ValueRow stats={round.stats} statKey="birdie" />
+                      <ValueRow stats={round.stats} statKey="par" />
+                      <ValueRow stats={round.stats} statKey="bogey" />
+                      <ValueRow stats={round.stats} statKey="doubleBogey" />
+                      <ValueRow stats={round.stats} statKey="ballInWater" />
+                      <ValueRow stats={round.stats} statKey="outOfBounds" />
+                      <ValueRow stats={round.stats} statKey="missedGir" />
+                      <ValueRow stats={round.stats} statKey="threePutt" />
+                      <ValueRow stats={round.stats} statKey="bunker" />
+                      <ValueRow stats={round.stats} statKey="sandSave" />
+                      <ValueRow stats={round.stats} statKey="fairwayHits" />
+                      <ValueRow stats={round.stats} statKey="missedPutt5Feet" />
+                      <ValueRow stats={round.stats} statKey="putt15To25Feet" />
+                      <ValueRow stats={round.stats} statKey="putt25Feet" />
+                      <ValueRow
+                        stats={round.stats}
+                        statKey="consecutiveBirdie"
+                      />
+                      <td>{calculatePoints(round)}</td>
+                    </tr>
+                  );
+                })}
+                <tr>
+                  <td>Total</td>
+                  <td />
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar +
+                        getToPar(
+                          holes,
+                          current.shots,
+                          current.currentHole,
+                          current.finnished
+                        ),
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.hio.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.doubleEagle.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.eagle.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.birdie.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.par.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.bogey.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.doubleBogey.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.ballInWater.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.outOfBounds.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.missedGir.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.threePutt.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.bunker.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + current.stats.sandSave.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.fairwayHits.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.missedPutt5Feet.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.putt15To25Feet.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.putt25Feet.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) =>
+                        soFar + current.stats.consecutiveBirdie.value,
+                      0
+                    )}
+                  </td>
+                  <td>
+                    {rounds.reduce(
+                      (soFar, current) => soFar + calculatePoints(current),
+                      0
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </StatsTable>
+          </>
         )}
       </div>
     );
