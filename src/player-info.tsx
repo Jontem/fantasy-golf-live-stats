@@ -1,30 +1,70 @@
 import * as React from "react";
-import { PlayerAggregate, Hole } from "./stats-aggregation";
+import {
+  PlayerAggregate,
+  Hole,
+  getPlayerAggregates
+} from "./stats-aggregation";
 import { getShotPoints, calculatePoints } from "./calculate-points";
 import { StatsTable, Points } from "./elements";
 import { ValueRow } from "./value-row";
+import { LeaderBoardResponse } from "./leaderboard-json-types";
 
 interface PlayerAggregateProps {
-  readonly playerAggregate: PlayerAggregate;
   readonly holes: ReadonlyArray<Hole>;
+  readonly playerId: string;
+  readonly leaderBoardResponse: LeaderBoardResponse;
 }
 interface State {
   readonly expanded: boolean;
+  readonly playerAggregate: PlayerAggregate | undefined;
 }
+
+const getPlayerScorecardUrl = (playerId: string) =>
+  `https://statdata.pgatour.com/r/490/2018/scorecards/${playerId}.json`;
 
 export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
   constructor(props: PlayerAggregateProps) {
     super(props);
     this.state = {
-      expanded: false
+      expanded: false,
+      playerAggregate: undefined
     };
   }
 
+  async componentDidMount() {
+    const r = await fetch(getPlayerScorecardUrl(this.props.playerId)).then(
+      res => res.json()
+    );
+
+    const playerId = r.p.id;
+    const leaderboardPlayer = this.props.leaderBoardResponse.leaderboard.players.find(
+      p => p.player_id === playerId
+    )!;
+    console.log(r);
+    const playerAggregate = getPlayerAggregates(
+      this.props.holes,
+      leaderboardPlayer,
+      r
+    );
+    this.setState(state => ({
+      playerAggregate
+    }));
+  }
+
   render(): JSX.Element {
-    const {
-      holes,
-      playerAggregate: { playerName, rounds }
-    } = this.props;
+    const { holes } = this.props;
+    const { playerAggregate } = this.state;
+
+    if (playerAggregate === undefined) {
+      return (
+        <div>
+          <h2>Loading</h2>
+        </div>
+      );
+    }
+
+    const { playerName, rounds } = playerAggregate;
+
     const setState = this.setState.bind(this);
     return (
       <div>
