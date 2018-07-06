@@ -8,6 +8,7 @@ import { getShotPoints, calculatePoints } from "./calculate-points";
 import { StatsTable, Points } from "./elements";
 import { ValueRow } from "./value-row";
 import { LeaderboardPlayer } from "./leaderboard-json-types";
+import { getPlayerName } from "./utilities";
 
 interface PlayerAggregateProps {
   readonly holes: ReadonlyArray<Hole>;
@@ -47,9 +48,7 @@ export class PlayerInfo extends React.Component<PlayerAggregateProps, State> {
     const { holes, leaderboardPlayer } = this.props;
     const { playerAggregate } = this.state;
 
-    const playerName = `${leaderboardPlayer.player_bio.first_name} ${
-      leaderboardPlayer.player_bio.last_name
-    }`;
+    const playerName = getPlayerName(leaderboardPlayer);
 
     if (playerAggregate === undefined) {
       return (

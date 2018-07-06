@@ -2,6 +2,7 @@ import * as React from "react";
 import { LeaderBoardResponse } from "./leaderboard-json-types";
 import { Hole } from "./stats-aggregation";
 import { PlayerInfo } from "./player-info";
+import { AddPlayer } from "./add-player";
 
 const leaderboardUrl =
   "https://statdata.pgatour.com/r/490/2018/leaderboard-v2.json";
@@ -84,6 +85,10 @@ export class App extends React.Component<Props, State> {
             );
           })}
         </div>
+        <AddPlayer
+          addedPlayers={new Set(players)}
+          players={leaderboard.leaderboard.players}
+        />
       </div>
     );
   }
