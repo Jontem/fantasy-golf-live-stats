@@ -5,6 +5,10 @@ export interface LeaderBoardResponse {
 export interface LeaderBoard {
   readonly courses: ReadonlyArray<Course>;
   readonly players: ReadonlyArray<LeaderBoardPlayer>;
+  readonly start_date: string;
+  readonly end_date: string;
+  readonly is_started: boolean;
+  readonly is_finnished: boolean;
 }
 
 export interface Course {

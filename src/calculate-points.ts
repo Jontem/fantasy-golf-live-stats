@@ -1,4 +1,4 @@
-import { exhaustiveCheck } from "ts-exhaustive-check";
+import { exhaustiveCheck } from "ts-exhaustive-check/lib-cjs";
 import {
   PlayerAggregateRound,
   PlayerAggregateRoundStats
