@@ -89,12 +89,12 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
               <th>Hole / Par</th>
               <th>To Par</th>
               <th>Hio</th>
-              <th>Double eagle</th>
-              <th>Eagle</th>
-              <th>Birde</th>
+              <th>-3</th>
+              <th>-2</th>
+              <th>-1</th>
               <th>Par</th>
-              <th>Bogey</th>
-              <th>Double bogey</th>
+              <th>+1</th>
+              <th>>= +2</th>
               <th>Ball in water</th>
               <th>Out of bounds</th>
               <th>Missed GIR</th>
