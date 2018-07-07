@@ -100,22 +100,22 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
                 <th>>=+2</th>
                 <th>Water</th>
                 <th>Out</th>
-                <th>Missed GIR</th>
+                <th>X GIR</th>
                 <th>3 putt</th>
-                <th>Bunker</th>
-                <th>Sandy</th>
-                <th>Fairway hit</th>
-                <th>Missed putt {"<"} 5 feet</th>
-                <th>Putt 15-25 feet</th>
-                <th>Putt > 25 feet</th>
-                <th>Birdie-Birdie</th>
+                <th>B</th>
+                <th>SS</th>
+                <th>FH</th>
+                <th>MP {"<"} 5 feet</th>
+                <th>P 15-25 feet</th>
+                <th>P > 25 feet</th>
+                <th>B-B</th>
                 <th>P</th>
               </thead>
               <tbody>
                 {rounds.map(round => {
                   return (
                     <tr key={round.id}>
-                      <td>Round {round.id}</td>
+                      <td>R{round.id}</td>
                       <td>
                         {round.finnished ? round.shots : round.currentHole}
                       </td>
