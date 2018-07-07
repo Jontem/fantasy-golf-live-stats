@@ -91,25 +91,25 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
                 <th />
                 <th>Hole / Par</th>
                 <th>To Par</th>
-                <th>Hio</th>
-                <th>-3</th>
-                <th>-2</th>
-                <th>-1</th>
+                <th title="Hole in one">Hio</th>
+                <th title="Double eagle">-3</th>
+                <th title="Eagle">-2</th>
+                <th title="Double birdie">-1</th>
                 <th>Par</th>
-                <th>+1</th>
-                <th>>=+2</th>
-                <th>Water</th>
-                <th>Out</th>
-                <th>X GIR</th>
-                <th>3 putt</th>
-                <th>B</th>
-                <th>SS</th>
-                <th>FH</th>
-                <th>MP {"<"} 5 feet</th>
-                <th>P 15-25 feet</th>
-                <th>P > 25 feet</th>
-                <th>B-B</th>
-                <th>P</th>
+                <th title="Bogey">+1</th>
+                <th title="Double bogey or worse">>=+2</th>
+                <th title="Ball in water">Water</th>
+                <th title="Out of bounds">Out</th>
+                <th title="Missed greens in regulation">X GIR</th>
+                <th title="Three putt">3 putt</th>
+                <th title="Bunker">B</th>
+                <th title="Sand save">SS</th>
+                <th title="Fairway hit">FH</th>
+                <th title="Missed putt under 5 feet">MP {"<"} 5 feet</th>
+                <th title="Holed putt from 15-25 feet">P 15-25 feet</th>
+                <th title="Holed putt from over 25 feet">P > 25 feet</th>
+                <th title="Consecutive birides">B-B</th>
+                <th title="Points">P</th>
               </thead>
               <tbody>
                 {rounds.map(round => {
