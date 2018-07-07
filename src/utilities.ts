@@ -5,3 +5,7 @@ export function getPlayerName(leaderboardPlayer: LeaderboardPlayer): string {
     leaderboardPlayer.player_bio.last_name
   }`;
 }
+
+export function getPlayerUrl(playerId: string): string {
+  return `https://pga-tour-res.cloudinary.com/image/upload/w_200/headshots_${playerId}.png`;
+}

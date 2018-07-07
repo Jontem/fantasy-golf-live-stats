@@ -8,7 +8,7 @@ import { getShotPoints, calculatePoints } from "./calculate-points";
 import { StatsTable, Points, PlayerHeader, DeletePlayer } from "./elements";
 import { ValueRow } from "./value-row";
 import { LeaderboardPlayer } from "./leaderboard-json-types";
-import { getPlayerName } from "./utilities";
+import { getPlayerName, getPlayerUrl } from "./utilities";
 import { fetchPlayerScorecard } from "./fetch-player-scorecard";
 
 interface PlayerInfoProps {
@@ -83,6 +83,9 @@ export class PlayerInfo extends React.Component<PlayerInfoProps, State> {
         </DeletePlayer>
         {this.state.expanded && (
           <>
+            <div>
+              <img src={getPlayerUrl(leaderboardPlayer.player_id)} />
+            </div>
             <p>{`${fetchDate.toLocaleDateString(
               "sv-SE"
             )} - ${fetchDate.toLocaleTimeString()}`}</p>
